@@ -6,16 +6,25 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "ANDROID_HOME": "/usr/lib/android-sdk"
+      }
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "ANDROID_HOME": "/usr/lib/android-sdk"
       }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "ANDROID_HOME": "/usr/lib/android-sdk"
+      }
     }
   },
   "submit": {
