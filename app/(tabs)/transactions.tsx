@@ -36,7 +36,8 @@ export default function TransactionsScreen() {
   }, [categoryById, filter, query, transactions]);
 
   const confirmDelete = (transaction: FinanceTransaction) => {
-    Alert.alert("Delete transaction?", "This will remove the entry from your on-device ledger.", [
+    const isSplit = Boolean(transaction.splitGroupId);
+    Alert.alert(isSplit ? "Delete split expense?" : "Delete transaction?", isSplit ? "This will remove every category allocation in the grouped expense." : "This will remove the entry from your on-device ledger.", [
       { text: "Cancel", style: "cancel" },
       { text: "Delete", style: "destructive", onPress: () => { void deleteTransaction(transaction.id).then((didDelete) => { if (!didDelete) Alert.alert("Couldn’t delete transaction", "Your entry was not changed. Please try again."); }); } },
     ]);
@@ -80,14 +81,17 @@ export default function TransactionsScreen() {
           if (item.kind === "date") return <Text style={[styles.dateHeader, { color: colors.muted }]}>{item.label}</Text>;
           const category = categoryById.get(item.transaction.categoryId);
           if (!category) return null;
+          const isSplit = Boolean(item.transaction.splitGroupId);
           return (
-            <View accessibilityLabel={`${item.transaction.type === "income" ? "Income" : "Expense"}: ${item.transaction.note || category.name}, ${item.transaction.date}`} style={[styles.transactionRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <CategoryIcon category={category} />
-              <View style={styles.transactionContent}>
-                <Text style={[styles.transactionTitle, { color: colors.foreground }]} numberOfLines={1}>{item.transaction.note || category.name}</Text>
-                <Text style={[styles.transactionMeta, { color: colors.muted }]}>{category.name} · {item.transaction.date}</Text>
-              </View>
-              <AmountText amountCents={item.transaction.amountCents} currencyCode={preferences.currencyCode} type={item.transaction.type} size="small" />
+            <View style={[styles.transactionRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`${isSplit ? "Edit split expense" : "Edit"} ${item.transaction.note || category.name}`} accessibilityHint={isSplit ? "Opens the full grouped expense for editing" : "Opens this transaction for editing"} onPress={() => isSplit ? router.push(`/edit-split/${item.transaction.splitGroupId}` as never) : router.push(`/edit/${item.transaction.id}` as never)} style={({ pressed }) => [styles.transactionEditButton, pressed && { opacity: financeUi.opacity.pressed }]}>
+                <CategoryIcon category={category} />
+                <View style={styles.transactionContent}>
+                  <Text style={[styles.transactionTitle, { color: colors.foreground }]} numberOfLines={1}>{item.transaction.note || category.name}</Text>
+                  <Text style={[styles.transactionMeta, { color: colors.muted }]}>{isSplit ? `Split allocation · ${category.name}` : `${category.name} · ${item.transaction.date}`}</Text>
+                </View>
+                <AmountText amountCents={item.transaction.amountCents} currencyCode={preferences.currencyCode} type={item.transaction.type} size="small" />
+              </Pressable>
               <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${item.transaction.note || category.name}`} accessibilityHint="Permanently removes this transaction after confirmation" onPress={() => confirmDelete(item.transaction)} style={({ pressed }) => [styles.deleteButton, pressed && { opacity: financeUi.opacity.pressed }]}>
                 <MaterialIcons name="delete-outline" size={20} color={colors.error} />
               </Pressable>
@@ -113,6 +117,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, lineHeight: 35, fontWeight: "800", letterSpacing: -0.6 },
   titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 19 },
   transactionContent: { flex: 1 },
+  transactionEditButton: { flex: 1, minHeight: 70, flexDirection: "row", alignItems: "center", gap: 11 },
   transactionMeta: { fontSize: 12, lineHeight: 17, marginTop: 2 },
   transactionRow: { minHeight: 72, borderRadius: financeUi.radius.button, borderWidth: financeUi.line.subtle, paddingLeft: 12, paddingRight: 5, marginBottom: 8, flexDirection: "row", alignItems: "center", gap: 11 },
   transactionTitle: { fontSize: 15, lineHeight: 21, fontWeight: "700" },

@@ -21,6 +21,7 @@ const MAPPING = {
   "wallet.pass.fill": "account-balance-wallet",
   "list.bullet.rectangle": "receipt-long",
   "chart.bar.fill": "bar-chart",
+  "chart.pie.fill": "pie-chart",
   "gearshape.fill": "settings",
   "plus": "add",
   "xmark": "close",

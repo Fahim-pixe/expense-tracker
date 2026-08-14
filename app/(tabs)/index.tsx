@@ -7,7 +7,7 @@ import { financeUi } from "@/constants/finance-ui";
 import { AmountText, CategoryIcon, EmptyState, PageLoader, SectionTitle, SurfaceCard } from "@/components/finance-ui";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
-import { calculateTotals, formatMoney, getCategoryTotals, getLocalDateKey, getMonthTransactions, type FinanceTransaction } from "@/lib/finance";
+import { calculateBudgetProgress, calculateTotals, formatMoney, getCategoryTotals, getLocalDateKey, getMonthKey, getMonthTransactions, getMonthlyBudget, type FinanceTransaction } from "@/lib/finance";
 import { useFinance } from "@/lib/finance-store";
 
 function todayKey() {
@@ -16,10 +16,25 @@ function todayKey() {
 
 export default function OverviewScreen() {
   const colors = useColors();
-  const { transactions, categories, preferences, isReady } = useFinance();
+  const { transactions, categories, preferences, budgets, categoryBudgets, isReady } = useFinance();
   const monthTransactions = useMemo(() => getMonthTransactions(transactions, new Date()), [transactions]);
   const totals = useMemo(() => calculateTotals(monthTransactions), [monthTransactions]);
-  const categoryTotals = useMemo(() => getCategoryTotals(monthTransactions, categories).slice(0, 3), [categories, monthTransactions]);
+  const monthlyBudget = useMemo(() => getMonthlyBudget(budgets, new Date()), [budgets]);
+  const budgetProgress = useMemo(() => calculateBudgetProgress(totals.expenseCents, monthlyBudget?.amountCents ?? 0), [monthlyBudget?.amountCents, totals.expenseCents]);
+  const allCategoryTotals = useMemo(() => getCategoryTotals(monthTransactions, categories), [categories, monthTransactions]);
+  const categoryTotals = useMemo(() => allCategoryTotals.slice(0, 3), [allCategoryTotals]);
+  const categoryBudgetAlert = useMemo(() => {
+    const spentByCategory = new Map(allCategoryTotals.map((item) => [item.category.id, item.amountCents]));
+    return categoryBudgets
+      .filter((budget) => budget.monthKey === getMonthKey(new Date()))
+      .map((budget) => {
+        const category = categories.find((item) => item.id === budget.categoryId);
+        const progress = calculateBudgetProgress(spentByCategory.get(budget.categoryId) ?? 0, budget.amountCents);
+        return category ? { category, progress } : null;
+      })
+      .filter((item): item is { category: NonNullable<typeof item>["category"]; progress: ReturnType<typeof calculateBudgetProgress> } => Boolean(item?.progress.isAtBudget))
+      .sort((a, b) => b.progress.percentUsed - a.progress.percentUsed)[0];
+  }, [allCategoryTotals, categories, categoryBudgets]);
   const recentTransactions = useMemo(
     () => [...transactions].sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)).slice(0, 5),
     [transactions],
@@ -59,7 +74,7 @@ export default function OverviewScreen() {
               </Pressable>
             </View>
 
-            <View style={[styles.balanceCard, { backgroundColor: colors.primary }]}>
+            <View style={[styles.balanceCard, { backgroundColor: colors.primary }]}> 
               <View style={styles.balanceTopRow}>
                 <View>
                   <Text style={[styles.balanceLabel, { color: colors.background }]}>MONTHLY NET</Text>
@@ -81,6 +96,18 @@ export default function OverviewScreen() {
                 </View>
               </View>
             </View>
+
+            {monthlyBudget ? <Pressable accessibilityRole="button" accessibilityLabel="Open monthly budget" accessibilityHint={budgetProgress.isOverBudget ? "You are over your monthly budget" : "Review your budget progress"} onPress={() => router.push("/budget" as never)} style={({ pressed }) => [styles.budgetAlert, { backgroundColor: budgetProgress.isAtBudget ? `${colors.error}12` : `${colors.success}12`, borderColor: budgetProgress.isAtBudget ? `${colors.error}55` : `${colors.success}55` }, pressed && styles.pressed]}>
+              <View style={[styles.budgetAlertIcon, { backgroundColor: budgetProgress.isAtBudget ? `${colors.error}18` : `${colors.success}18` }]}><MaterialIcons name={budgetProgress.isAtBudget ? "warning-amber" : "savings"} size={20} color={budgetProgress.isAtBudget ? colors.error : colors.success} /></View>
+              <View style={styles.budgetAlertCopy}><Text style={[styles.budgetAlertTitle, { color: budgetProgress.isAtBudget ? colors.error : colors.foreground }]}>{budgetProgress.isOverBudget ? `${formatMoney(Math.abs(budgetProgress.remainingCents), preferences.currencyCode)} over budget` : `${formatMoney(budgetProgress.remainingCents, preferences.currencyCode)} left this month`}</Text><Text style={[styles.budgetAlertDescription, { color: colors.muted }]}>{formatMoney(budgetProgress.expenseCents, preferences.currencyCode)} spent of {formatMoney(budgetProgress.budgetCents, preferences.currencyCode)} target</Text></View>
+              <MaterialIcons name="chevron-right" size={21} color={colors.muted} />
+            </Pressable> : null}
+
+            {categoryBudgetAlert ? <Pressable accessibilityRole="button" accessibilityLabel={`Open ${categoryBudgetAlert.category.name} category budget`} accessibilityHint={`${categoryBudgetAlert.category.name} has reached its spending limit`} onPress={() => router.push("/category-budgets" as never)} style={({ pressed }) => [styles.budgetAlert, { backgroundColor: `${colors.error}12`, borderColor: `${colors.error}55` }, pressed && styles.pressed]}>
+              <View style={[styles.budgetAlertIcon, { backgroundColor: `${colors.error}18` }]}><MaterialIcons name="warning-amber" size={20} color={colors.error} /></View>
+              <View style={styles.budgetAlertCopy}><Text style={[styles.budgetAlertTitle, { color: colors.error }]}>{categoryBudgetAlert.category.name} is over its limit</Text><Text style={[styles.budgetAlertDescription, { color: colors.muted }]}>{formatMoney(categoryBudgetAlert.progress.expenseCents, preferences.currencyCode)} spent of {formatMoney(categoryBudgetAlert.progress.budgetCents, preferences.currencyCode)} target</Text></View>
+              <MaterialIcons name="chevron-right" size={21} color={colors.muted} />
+            </Pressable> : null}
 
             <SectionTitle title="Spending pulse" />
             <SurfaceCard style={styles.pulseCard}>
@@ -162,6 +189,11 @@ const styles = StyleSheet.create({
   balanceMetaValue: { fontSize: 15, lineHeight: 21, fontWeight: "800", fontVariant: ["tabular-nums"] },
   balanceTopRow: { flexDirection: "row", justifyContent: "space-between" },
   balanceValue: { fontSize: 33, lineHeight: 41, fontWeight: "800", letterSpacing: -1, fontVariant: ["tabular-nums"], marginTop: 4 },
+  budgetAlert: { minHeight: 70, borderWidth: financeUi.line.subtle, borderRadius: financeUi.radius.button, paddingHorizontal: 13, marginBottom: financeUi.spacing.section, flexDirection: "row", alignItems: "center", gap: 10 },
+  budgetAlertCopy: { flex: 1 },
+  budgetAlertDescription: { fontSize: 12, lineHeight: 17, marginTop: 1 },
+  budgetAlertIcon: { width: 38, height: 38, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  budgetAlertTitle: { fontSize: 14, lineHeight: 20, fontWeight: "800" },
   bar: { borderRadius: 5, width: "100%" },
   barChart: { flexDirection: "row", height: 95, alignItems: "flex-end", justifyContent: "space-between", marginTop: 15 },
   barColumn: { flex: 1, alignItems: "center", gap: 7 },

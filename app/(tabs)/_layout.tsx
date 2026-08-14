@@ -32,6 +32,7 @@ export default function TabLayout() {
     >
       <Tabs.Screen name="index" options={{ title: "Overview", tabBarIcon: ({ color }) => <IconSymbol size={24} name="wallet.pass.fill" color={color} /> }} />
       <Tabs.Screen name="transactions" options={{ title: "Activity", tabBarIcon: ({ color }) => <IconSymbol size={24} name="list.bullet.rectangle" color={color} /> }} />
+      <Tabs.Screen name="budget" options={{ title: "Budget", tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.pie.fill" color={color} /> }} />
       <Tabs.Screen name="insights" options={{ title: "Insights", tabBarIcon: ({ color }) => <IconSymbol size={24} name="chart.bar.fill" color={color} /> }} />
       <Tabs.Screen name="settings" options={{ title: "Settings", tabBarIcon: ({ color }) => <IconSymbol size={23} name="gearshape.fill" color={color} /> }} />
     </Tabs>

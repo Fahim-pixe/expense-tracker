@@ -87,7 +87,15 @@ export default function RootLayout() {
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="add" options={{ presentation: "modal" }} />
+              <Stack.Screen name="split" options={{ presentation: "modal" }} />
+              <Stack.Screen name="edit-split/[groupId]" options={{ presentation: "modal" }} />
+              <Stack.Screen name="edit/[id]" options={{ presentation: "modal" }} />
               <Stack.Screen name="categories" options={{ presentation: "modal" }} />
+              <Stack.Screen name="recurring" options={{ presentation: "modal" }} />
+              <Stack.Screen name="category-budgets" options={{ presentation: "modal" }} />
+              <Stack.Screen name="category-budgets/[id]" options={{ presentation: "modal" }} />
+              <Stack.Screen name="csv" options={{ presentation: "modal" }} />
+              <Stack.Screen name="backups" options={{ presentation: "modal" }} />
               <Stack.Screen name="oauth/callback" />
             </Stack>
             <StatusBar style="auto" />

@@ -78,6 +78,7 @@ export default function AddTransactionScreen() {
                   <TextInput autoFocus value={amount} onChangeText={setAmount} placeholder="0.00" placeholderTextColor={colors.muted} keyboardType="decimal-pad" maxLength={12} accessibilityLabel={`Amount in ${preferences.currencyCode}`} accessibilityHint="Enter a positive amount with up to two decimal places" style={[styles.amountInput, { color: colors.foreground }]} returnKeyType="done" onSubmitEditing={save} />
                 </View>
               </View>
+              {type === "expense" ? <Pressable accessibilityRole="button" accessibilityLabel="Split this expense across categories" onPress={() => router.push("/split" as never)} style={({ pressed }) => [styles.splitButton, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && styles.savePressed]}><MaterialIcons name="call-split" size={19} color={colors.primary} /><Text style={[styles.splitButtonText, { color: colors.primary }]}>Split across categories</Text><MaterialIcons name="chevron-right" size={20} color={colors.muted} /></Pressable> : null}
               <Text style={[styles.fieldLabel, { color: colors.muted, marginBottom: 9 }]}>CATEGORY</Text>
             </View>
           }
@@ -134,4 +135,6 @@ const styles = StyleSheet.create({
   saveDisabled: { opacity: 0.72 },
   saveButtonText: { fontSize: 16, lineHeight: 22, fontWeight: "800" },
   savePressed: { opacity: financeUi.opacity.pressed, transform: [{ scale: 0.98 }] },
+  splitButton: { minHeight: 46, borderWidth: financeUi.line.subtle, borderRadius: financeUi.radius.button, marginBottom: 20, paddingHorizontal: 13, flexDirection: "row", alignItems: "center", gap: 8 },
+  splitButtonText: { flex: 1, fontSize: 14, lineHeight: 20, fontWeight: "800" },
 });

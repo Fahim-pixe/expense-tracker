@@ -74,6 +74,12 @@ const config: ExpoConfig = {
   plugins: [
     "expo-router",
     [
+      "expo-local-authentication",
+      {
+        faceIDPermission: "Allow $(PRODUCT_NAME) to use Face ID to protect encrypted backup actions.",
+      },
+    ],
+    [
       "expo-splash-screen",
       {
         image: "./assets/images/splash-icon.png",
@@ -92,6 +98,24 @@ const config: ExpoConfig = {
           buildArchs: ["armeabi-v7a", "arm64-v8a"],
           minSdkVersion: 24,
         },
+      },
+    ],
+    [
+      "react-native-android-widget",
+      {
+        widgets: [
+          {
+            name: "BudgetSnapshot",
+            label: "Budget Snapshot",
+            description: "Shows monthly spending, remaining budget, and category-limit alerts.",
+            minWidth: "180dp",
+            minHeight: "110dp",
+            targetCellWidth: 4,
+            targetCellHeight: 2,
+            resizeMode: "horizontal|vertical",
+            updatePeriodMillis: 1800000,
+          },
+        ],
       },
     ],
   ],

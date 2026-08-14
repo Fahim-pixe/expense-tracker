@@ -23,6 +23,9 @@ export default function SettingsScreen() {
   };
   const rows = [
     { id: "categories", icon: "category" as const, title: "Manage categories", detail: `${categories.length} categories`, action: () => router.push("/categories") },
+    { id: "recurring", icon: "event-repeat" as const, title: "Recurring transactions", detail: "Automate weekly, monthly, or custom entries", action: () => router.push("/recurring" as never) },
+    { id: "csv", icon: "table-view" as const, title: "CSV import & export", detail: "Move your transaction ledger safely", action: () => router.push("/csv" as never) },
+    { id: "backups", icon: "lock-outline" as const, title: "Encrypted backups", detail: "Export or restore your ledger", action: () => router.push("/backups" as never) },
     { id: "reset", icon: "delete-outline" as const, title: "Reset local data", detail: `${transactions.length} transactions stored`, action: confirmReset, destructive: true },
   ];
   return (

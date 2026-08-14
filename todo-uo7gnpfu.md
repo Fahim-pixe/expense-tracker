@@ -10,3 +10,34 @@
 - [x] Generate and apply a production-ready Expense Tracker application icon and branding configuration.
 - [x] Add regression tests and validate type safety, linting, tests, and the Expo configuration.
 - [x] Save a checkpoint containing the verified production-readiness improvements.
+- [x] Commit the verified production-hardening changes to the selected GitHub repository.
+- [x] Define and document encrypted backup, transaction-editing, and monthly-budget user flows.
+- [x] Implement password-protected export and import of the local ledger.
+- [x] Implement transaction editing with validated updates and persistent changes.
+- [x] Implement monthly budget targets, progress tracking, and overspend alerts.
+- [x] Add regression tests and validate the new backup, editing, and budget features.
+- [x] Save a checkpoint containing the verified backup, editing, and budget enhancements.
+- [x] Define recurring transaction, category-budget, and biometric backup-security user flows.
+- [x] Implement recurring transaction schedules with safe catch-up generation and local persistence.
+- [x] Implement category-level spending targets, progress tracking, and overspend alerts.
+- [x] Implement optional biometric protection for backup export and restore actions.
+- [x] Add regression tests and validate recurring, category-budget, and biometric security behavior.
+- [x] Save a checkpoint containing the verified recurring, category-budget, and biometric enhancements.
+- [x] Define flexible recurrence, split-transaction, CSV portability, budget-widget, and Android build automation flows.
+- [x] Implement weekly and custom recurrence frequencies with safe catch-up processing.
+- [x] Implement validated split-transaction allocation across multiple categories.
+- [x] Implement user-accessible CSV export and import with safe validation and conflict handling.
+- [x] Add a budget-widget support surface and an Android APK build workflow for repository pushes.
+- [x] Add regression tests and validate the expanded finance, CSV, and automation behavior.
+- [x] Save a checkpoint containing the verified schedule, split, CSV, widget, and automation enhancements.
+- [x] Define signed release, editable split-expense, and third-party CSV mapping requirements.
+- [x] Implement editing of existing split-expense allocations with atomic persistence.
+- [x] Implement guided source-column mapping for third-party CSV imports.
+- [x] Implement signed release APK and AAB artifacts in the GitHub Actions workflow with documented secure secret configuration.
+- [x] Add regression tests and validate split editing, CSV mapping, and release workflow behavior.
+- [x] Save a checkpoint containing the verified release, split-editing, and CSV-mapping enhancements.
+- [x] Audit the Kotlin native ledger persistence and document a non-destructive Room migration path.
+- [x] Add Room schema, DAO, repository, and native Android dependency configuration.
+- [x] Migrate legacy SharedPreferences ledger data into Room and connect the Kotlin UI state to the repository.
+- [x] Add ledger integrity tests and validate the Kotlin Android build configuration.
+- [x] Save a checkpoint containing the verified native Android Room modernization.
