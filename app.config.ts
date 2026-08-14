@@ -21,14 +21,10 @@ const bundleId =
       return /^[a-zA-Z]/.test(segment) ? segment : "x" + segment;
     })
     .join(".") || "space.manus.app";
-// Extract timestamp from bundle ID and prefix with "manus" for deep link scheme
-// e.g., "space.manus.my.app.t20240115103045" -> "manus20240115103045"
+
 const env = {
-  // App branding - update these values directly (do not use env vars)
   appName: "Expense Tracker",
   appSlug: "expense-tracker",
-  // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
-  // Leave empty to use the default icon from assets/images/icon.png
   logoUrl: "/manus-storage/expense-tracker-icon_d049c122.png",
   scheme: "expense-tracker",
   iosBundleId: bundleId,
@@ -125,6 +121,11 @@ const config: ExpoConfig = {
     typedRoutes: true,
     reactCompiler: true,
   },
+  extra: {
+    eas: {
+      projectId: "0464d96d-4603-4304-b2fa-56b92230fdc7"
+    }
+  }
 };
 
 export default config;
