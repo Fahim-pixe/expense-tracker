@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 
 @Database(
     entities = [TransactionEntity::class, CategoryEntity::class, LedgerPreferenceEntity::class],
@@ -18,7 +19,14 @@ abstract class FinanceDatabase : RoomDatabase() {
             context.applicationContext,
             FinanceDatabase::class.java,
             "expense-tracker.db",
-        ).build()
+        ).addMigrations(*FinanceDatabaseMigrations.all).build()
     }
 }
 
+/**
+ * The authoritative registry for explicit schema upgrades. Keep this empty at version one;
+ * every later database version must add its migration here and extend the instrumentation suite.
+ */
+object FinanceDatabaseMigrations {
+    val all: Array<Migration> = emptyArray()
+}

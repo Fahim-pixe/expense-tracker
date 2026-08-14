@@ -1,12 +1,12 @@
 # Native Android Validation Strategy
 
-The Kotlin app follows staged validation. **P0 checks are required before the Room foundation is considered production-ready.** Instrumentation, Compose UI, and performance suites are deliberately separated rather than blocking small local-first changes before the project has a repeatable native build path.
+The Kotlin app follows staged validation. **P0 checks are required before the Room foundation is considered production-ready.** The focused Compose flows and migration baseline now run on the existing native CI emulator; broader accessibility and scale checks remain separate release-quality gates.
 
 | Tier | Scope | Required now |
 | --- | --- | --- |
 | P0 — correctness and build | Financial unit tests; Room DAO tests; legacy import instrumentation test; schema export; `test`, `lint`, and `assembleDebug`. | Yes |
-| P1 — interaction reliability | Compose tests for add, delete, category-management, empty, and validation states; rotation and process-recreation tests. | After P0 is green |
-| P2 — scale and resilience | Large-ledger performance, accessibility scans, migration regression suite, and low-end-device profiling. | Before broad product expansion |
+| P1 — interaction reliability | Compose tests for add, delete, and category-management; remaining empty, validation, rotation, and process-recreation coverage. | Compose core flows are required now; remaining flows follow feature changes. |
+| P2 — scale and resilience | Large-ledger performance, accessibility scans, migration regression suite, and low-end-device profiling. | Run to the cadence in `QUALITY_VALIDATION.md`. |
 
 ## P0 acceptance checks
 
@@ -16,4 +16,4 @@ The Kotlin app follows staged validation. **P0 checks are required before the Ro
 4. Room-generated schema JSON is checked into `app/schemas` for the initial database version and for every later migration.
 5. A fresh checkout can run `./gradlew test lint assembleDebug` on an Android-capable runner.
 
-The sandbox cannot run the Android toolchain because it does not provide an Android SDK. The project therefore includes a Gradle wrapper and a native CI workflow so P0 validation runs on GitHub Actions or Android Studio.
+The repository includes a Gradle wrapper and native CI workflow. Local validation requires an installed Android SDK and Java 17; GitHub Actions provides the repeatable emulator execution path.

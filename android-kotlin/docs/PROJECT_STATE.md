@@ -1,6 +1,6 @@
 # Current Native Android Project State
 
-**Last updated:** Room persistence audit and P0 build-readiness milestone
+**Last updated:** Native quality validation milestone
 
 ## Product boundary
 
@@ -33,4 +33,12 @@ The Room database separates transactions, categories, and currency preferences. 
 | Native build | `./gradlew test lint assembleDebug` succeeds with Java 17; the debug instrumentation APK also assembles. | Complete |
 | CI execution | The dedicated workflow runs build checks and `connectedDebugAndroidTest` on a stable headless API 29 emulator. | Complete — both workflow jobs passed for the audit commit. |
 
-No new product capability is introduced by this milestone. The P0 Room foundation is green; a subsequent milestone can now be scoped without bypassing the staged validation strategy.
+## Quality validation status
+
+| Area | Current safeguard | Next required review |
+| --- | --- | --- |
+| Compose interactions | Instrumentation coverage drives add, delete, and custom-category flows in the real app. | Expand to validation, empty, rotation, and process-recreation states when those flows change. |
+| Database upgrades | Version-one schema is packaged for tests; an explicit migration registry and version-one recreation test are committed. | Every future version must register and test its migration contract. |
+| Accessibility and scale | A documented release-candidate cadence covers TalkBack, maximum text size, and deterministic 10,000-record ledger validation. | Run before relevant releases and before broader product expansion. |
+
+No new product capability is introduced by this milestone. The local-first foundation remains green with an expanded quality gate for interaction, migration, accessibility, and scale work.

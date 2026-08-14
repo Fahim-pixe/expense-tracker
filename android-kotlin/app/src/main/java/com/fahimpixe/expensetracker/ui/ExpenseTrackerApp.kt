@@ -50,6 +50,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,6 +83,7 @@ fun ExpenseTrackerApp(viewModel: FinanceViewModel) {
             NavigationBar(containerColor = AppTokens.Surface) {
                 tabs.forEachIndexed { index, tab ->
                     NavigationBarItem(
+                        modifier = Modifier.testTag("tab-${tab.label.lowercase()}"),
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
                         icon = tab.icon,
@@ -94,6 +96,7 @@ fun ExpenseTrackerApp(viewModel: FinanceViewModel) {
             if (selectedTab != 3) {
                 ExtendedFloatingActionButton(
                     onClick = { showAddTransaction = true },
+                    modifier = Modifier.testTag("add-transaction"),
                     containerColor = AppTokens.LedgerBlue,
                     contentColor = AppTokens.Surface,
                     icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
@@ -166,7 +169,7 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
             OutlinedTextField(
                 value = amount,
                 onValueChange = { amount = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("transaction-amount"),
                 label = { Text("Amount") },
                 prefix = { Text(currencyPrefix(state.currencyCode)) },
                 placeholder = { Text("0.00") },
@@ -180,13 +183,14 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
                     FilterChip(
                         selected = category.id == categoryId,
                         onClick = { categoryId = category.id },
+                        modifier = Modifier.testTag("transaction-category-${category.id}"),
                         label = { Text(category.name) },
                     )
                 }
             }
 
-            OutlinedTextField(value = note, onValueChange = { note = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Note") }, placeholder = { Text("Optional") }, singleLine = true)
-            OutlinedTextField(value = date, onValueChange = { date = it }, modifier = Modifier.fillMaxWidth(), label = { Text("Date") }, placeholder = { Text("YYYY-MM-DD") }, singleLine = true)
+            OutlinedTextField(value = note, onValueChange = { note = it }, modifier = Modifier.fillMaxWidth().testTag("transaction-note"), label = { Text("Note") }, placeholder = { Text("Optional") }, singleLine = true)
+            OutlinedTextField(value = date, onValueChange = { date = it }, modifier = Modifier.fillMaxWidth().testTag("transaction-date"), label = { Text("Date") }, placeholder = { Text("YYYY-MM-DD") }, singleLine = true)
             if (validationMessage.isNotBlank()) Text(validationMessage, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
 
             Button(
@@ -194,7 +198,7 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
                     if (viewModel.addTransaction(type, amount, categoryId, note, date)) onDismiss()
                     else validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                 },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp).testTag("save-transaction"),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
             ) {
                 Text("Save ${if (type == TransactionType.EXPENSE) "expense" else "income"}", fontWeight = FontWeight.Bold)
@@ -233,8 +237,8 @@ private fun ManageCategoriesSheet(viewModel: FinanceViewModel, onDismiss: () -> 
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(value = name, onValueChange = { name = it }, modifier = Modifier.weight(1f), label = { Text("New category") }, singleLine = true)
-                Button(onClick = { if (name.isBlank()) error = "Enter a category name." else { viewModel.addCategory(name, type); name = ""; error = "" } }, modifier = Modifier.height(56.dp)) { Icon(Icons.Outlined.Add, contentDescription = "Add category") }
+                OutlinedTextField(value = name, onValueChange = { name = it }, modifier = Modifier.weight(1f).testTag("category-name"), label = { Text("New category") }, singleLine = true)
+                Button(onClick = { if (name.isBlank()) error = "Enter a category name." else { viewModel.addCategory(name, type); name = ""; error = "" } }, modifier = Modifier.height(56.dp).testTag("add-category")) { Icon(Icons.Outlined.Add, contentDescription = "Add category") }
             }
             if (error.isNotBlank()) Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.height(2.dp))

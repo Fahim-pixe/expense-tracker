@@ -49,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -219,8 +220,22 @@ fun SettingsScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier, o
         item {
             Text("YOUR DATA", color = AppTokens.Muted, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
             Spacer(Modifier.height(8.dp))
-            SettingsActionCard(Icons.Outlined.ManageAccounts, "Manage categories", "${state.categories.size} categories", AppTokens.LedgerBlue, onManageCategories)
-            SettingsActionCard(Icons.Outlined.DeleteOutline, "Reset local data", "${state.transactions.size} transactions stored", AppTokens.SpendCoral) { confirmReset = true }
+            SettingsActionCard(
+                icon = Icons.Outlined.ManageAccounts,
+                title = "Manage categories",
+                detail = "${state.categories.size} categories",
+                tint = AppTokens.LedgerBlue,
+                onClick = onManageCategories,
+                modifier = Modifier.testTag("manage-categories"),
+            )
+            SettingsActionCard(
+                icon = Icons.Outlined.DeleteOutline,
+                title = "Reset local data",
+                detail = "${state.transactions.size} transactions stored",
+                tint = AppTokens.SpendCoral,
+                onClick = { confirmReset = true },
+                modifier = Modifier.testTag("reset-local-data"),
+            )
         }
         item {
             Card(colors = CardDefaults.cardColors(containerColor = AppTokens.Surface), shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.CardRadius)) {
@@ -314,7 +329,11 @@ private fun CategoryTotalsCard(totals: List<CategoryTotal>, totalExpense: Long, 
 @Composable
 private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDelete: () -> Unit, includeDelete: Boolean = false) {
     val category = state.categories.firstOrNull { it.id == entry.categoryId } ?: return
-    Card(colors = CardDefaults.cardColors(containerColor = AppTokens.Surface), shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius)) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = AppTokens.Surface),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
+        modifier = Modifier.testTag("transaction-card-${entry.id}"),
+    ) {
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
             CategoryDot(category)
             Spacer(Modifier.width(11.dp))
@@ -327,7 +346,11 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
                 color = if (entry.type == TransactionType.INCOME) AppTokens.IncomeGreen else AppTokens.SpendCoral,
                 fontWeight = FontWeight.ExtraBold,
             )
-            if (includeDelete) IconButton(onClick = onDelete) { Icon(Icons.Outlined.DeleteOutline, contentDescription = "Delete transaction", tint = AppTokens.SpendCoral) }
+            if (includeDelete) {
+                IconButton(onClick = onDelete, modifier = Modifier.testTag("delete-transaction-${entry.id}")) {
+                    Icon(Icons.Outlined.DeleteOutline, contentDescription = "Delete transaction", tint = AppTokens.SpendCoral)
+                }
+            }
         }
     }
 }
@@ -410,8 +433,20 @@ private fun DailySpendingCard(days: List<Pair<LocalDate, Long>>, currencyCode: S
 }
 
 @Composable
-private fun SettingsActionCard(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, detail: String, tint: Color, onClick: () -> Unit) {
-    Card(onClick = onClick, colors = CardDefaults.cardColors(containerColor = AppTokens.Surface), shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius), modifier = Modifier.fillMaxWidth()) {
+private fun SettingsActionCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    detail: String,
+    tint: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = AppTokens.Surface),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
+        modifier = modifier.fillMaxWidth(),
+    ) {
         Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, contentDescription = null, tint = tint)
             Spacer(Modifier.width(12.dp))

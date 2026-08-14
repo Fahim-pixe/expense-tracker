@@ -20,6 +20,8 @@ Reset clears Room records, restores default categories and USD, and removes the 
 
 The native suite includes Room persistence contract coverage for stable transaction identity, integer minor-unit amounts, default-category identity, and the singleton currency preference. The P0 command is `./gradlew test lint assembleDebug`; the Room instrumentation suite runs with `./gradlew connectedDebugAndroidTest` on an emulator or the native CI workflow.
 
+The committed version-one schema is also packaged into the instrumentation assets. `FinanceDatabaseMigrationScaffoldTest` recreates and validates that baseline with representative category, transaction, and currency records. Before any schema version increase, follow [`MIGRATION_CONTRACT.md`](./MIGRATION_CONTRACT.md) and extend that test with the new upgrade path.
+
 ## References
 
 [1]: https://developer.android.com/jetpack/androidx/releases/room "Android Developers — Room release notes and dependency setup"
