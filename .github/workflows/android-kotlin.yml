@@ -62,11 +62,13 @@ jobs:
           java-version: "17"
           cache: gradle
 
-      - name: Run Room instrumentation tests on API 35
+      - name: Run Room instrumentation tests on API 29
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 35
+          api-level: 29
           arch: x86_64
+          emulator-options: -no-snapshot -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect
+          disable-animations: true
           script: cd android-kotlin && ./gradlew --no-daemon connectedDebugAndroidTest
 
       - name: Upload instrumentation reports

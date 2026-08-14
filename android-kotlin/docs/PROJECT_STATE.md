@@ -31,6 +31,6 @@ The Room database separates transactions, categories, and currency preferences. 
 | DAO runtime behavior | In-memory Room instrumentation coverage verifies transaction ordering and deletion, unique category identity, and currency preference upserts. | Compiles locally; executes on CI emulator |
 | Legacy import | Instrumentation coverage validates non-destructive import, malformed-record rejection, idempotency, and reset protection. | Compiles locally; executes on CI emulator |
 | Native build | `./gradlew test lint assembleDebug` succeeds with Java 17; the debug instrumentation APK also assembles. | Complete |
-| CI execution | The dedicated workflow runs build checks and `connectedDebugAndroidTest` on API 35. | Pending first GitHub Actions run |
+| CI execution | The dedicated workflow runs build checks and `connectedDebugAndroidTest` on a stable headless API 29 emulator. | Pending the corrected GitHub Actions run |
 
 No new product capability is introduced by this milestone. The next scope should begin only after the CI emulator run is green.
