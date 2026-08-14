@@ -49,4 +49,4 @@
 - [x] Update the native Android current-state record and separate P0 validation from future instrumentation and UI tests.
 - [x] Audit generated Room schema configuration, DAO constraints, and legacy SharedPreferences import behavior.
 - [x] Add Room DAO and legacy-import instrumentation test coverage with a native Gradle build-readiness path.
-- [ ] Validate and commit the completed focused Kotlin Room audit to GitHub.
+- [x] Validate and commit the completed focused Kotlin Room audit to GitHub.
