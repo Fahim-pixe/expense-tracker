@@ -19,8 +19,10 @@ import org.json.JSONObject
 import java.time.LocalDate
 import java.util.UUID
 
-class FinanceRepository(context: Context) {
-    private val database = FinanceDatabase.create(context)
+class FinanceRepository(
+    context: Context,
+    private val database: FinanceDatabase = FinanceDatabase.create(context),
+) {
     private val dao = database.financeDao()
     private val legacyStorage = LegacyFinanceStorage(context)
 

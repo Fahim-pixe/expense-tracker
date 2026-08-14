@@ -4,7 +4,7 @@
 
 The native Android ledger now uses Room as its on-device source of truth. The initial schema stores transactions, categories, and the selected currency in separate indexed tables. Monetary values remain `Long` minor units.
 
-The build uses Room **2.8.4** with KSP. This matches the project’s Kotlin 2.0 baseline; the official Room release notes recommend KSP for Kotlin sources and state that Room 2.7+ targets Kotlin 2.0 with KSP2 support.[1]
+The build uses Room **2.7.2** with KSP. This matches the project’s Kotlin 2.0 baseline; the official Room release notes recommend KSP for Kotlin sources and state that Room 2.7+ targets Kotlin 2.0 with KSP2 support.[1]
 
 ## Legacy-data import
 
@@ -18,7 +18,7 @@ Reset clears Room records, restores default categories and USD, and removes the 
 
 ## Validation
 
-The native unit suite includes Room persistence contract coverage for stable transaction identity, integer minor-unit amounts, default-category identity, and the singleton currency preference. Android Studio or continuous integration must run `./gradlew test` and `./gradlew assembleDebug` after Gradle sync because the sandbox does not include the Android SDK or Gradle wrapper.
+The native suite includes Room persistence contract coverage for stable transaction identity, integer minor-unit amounts, default-category identity, and the singleton currency preference. The P0 command is `./gradlew test lint assembleDebug`; the Room instrumentation suite runs with `./gradlew connectedDebugAndroidTest` on an emulator or the native CI workflow.
 
 ## References
 

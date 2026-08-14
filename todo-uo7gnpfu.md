@@ -42,3 +42,11 @@
 - [x] Add ledger integrity tests and validate the Kotlin Android build configuration.
 - [x] Save a checkpoint containing the verified native Android Room modernization.
 - [x] Commit the accumulated application and Kotlin native modernization changes to the selected GitHub repository.
+- [x] Fix GitHub Actions APK build setup so pnpm is installed before pnpm-based caching runs.
+- [x] Validate and commit the corrected Android build workflow to GitHub.
+- [x] Fix Expo prebuild CI invocation and restore all Android icon assets referenced by app configuration.
+- [x] Validate and commit the corrected Expo Android build workflow and required assets to GitHub.
+- [x] Update the native Android current-state record and separate P0 validation from future instrumentation and UI tests.
+- [x] Audit generated Room schema configuration, DAO constraints, and legacy SharedPreferences import behavior.
+- [x] Add Room DAO and legacy-import instrumentation test coverage with a native Gradle build-readiness path.
+- [ ] Validate and commit the completed focused Kotlin Room audit to GitHub.

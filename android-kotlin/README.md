@@ -16,4 +16,10 @@ The main flows are the same as the existing product: add income or expenses, cho
 
 Open `android-kotlin` in a recent Android Studio release, allow Gradle to sync, select an emulator or Android device running API 26 or later, and choose **Run**. The package name is `com.fahimpixe.expensetracker`.
 
-> The sandbox includes Java 21 but does not include Gradle, the Kotlin compiler, or the Android SDK. The project structure and Gradle configuration are therefore included for Android Studio or a CI environment to compile and run.
+## Engineering records
+
+- [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) records the current native architecture, Room audit decisions, and remaining P0 work.
+- [`docs/ROOM_MIGRATION.md`](./docs/ROOM_MIGRATION.md) documents the non-destructive legacy-ledger import and reset behavior.
+- [`docs/TESTING.md`](./docs/TESTING.md) separates required P0 validation from later instrumentation, UI, and performance suites.
+
+> The native module now includes a Gradle wrapper for reproducible Android Studio and CI builds. The sandbox still does not provide an Android SDK, so full native compilation is performed by Android Studio or GitHub Actions.

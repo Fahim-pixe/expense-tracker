@@ -1,0 +1,78 @@
+name: Native Kotlin Android
+
+on:
+  push:
+    paths:
+      - "android-kotlin/**"
+      - ".github/workflows/android-kotlin.yml"
+  pull_request:
+    paths:
+      - "android-kotlin/**"
+      - ".github/workflows/android-kotlin.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Unit, lint, and debug build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-kotlin
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Validate wrapper build and Room schema export
+        run: ./gradlew --no-daemon test lint assembleDebug
+
+      - name: Upload reports and generated Room schemas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-kotlin-verify-reports
+          path: |
+            android-kotlin/app/build/reports/**
+            android-kotlin/app/schemas/**
+          if-no-files-found: warn
+
+  room-instrumentation:
+    name: Room instrumentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-kotlin
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Run Room instrumentation tests on API 35
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          script: cd android-kotlin && ./gradlew --no-daemon connectedDebugAndroidTest
+
+      - name: Upload instrumentation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-kotlin-instrumentation-reports
+          path: android-kotlin/app/build/reports/androidTests/**
+          if-no-files-found: warn
