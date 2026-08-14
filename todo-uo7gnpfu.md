@@ -42,16 +42,13 @@
 - [x] Add ledger integrity tests and validate the Kotlin Android build configuration.
 - [x] Save a checkpoint containing the verified native Android Room modernization.
 - [x] Commit the accumulated application and Kotlin native modernization changes to the selected GitHub repository.
-- [x] Fix GitHub Actions APK build setup so pnpm is installed before pnpm-based caching runs.
-- [x] Validate and commit the corrected Android build workflow to GitHub.
-- [x] Fix Expo prebuild CI invocation and restore all Android icon assets referenced by app configuration.
-- [x] Validate and commit the corrected Expo Android build workflow and required assets to GitHub.
 - [x] Update the native Android current-state record and separate P0 validation from future instrumentation and UI tests.
 - [x] Audit generated Room schema configuration, DAO constraints, and legacy SharedPreferences import behavior.
 - [x] Add Room DAO and legacy-import instrumentation test coverage with a native Gradle build-readiness path.
-- [x] Validate and commit the completed focused Kotlin Room audit to GitHub.
-- [ ] Inspect the Compose UI testing seams and record the native quality-milestone scope.
+- [ ] Validate and commit the completed focused Kotlin Room audit to GitHub.
+- [x] Inspect the Compose UI testing seams and record the native quality-milestone scope.
 - [x] Add Compose UI tests for transaction addition, deletion, and category-management flows.
 - [x] Add Room migration-test scaffolding and document the required version-two migration contract.
 - [x] Define and validate an accessibility and large-ledger performance pass for the native Android app.
 - [ ] Validate, checkpoint, and commit the native Android quality milestone to GitHub.
+- [x] Align Expo SDK 54 dependency versions reported by Expo Doctor and verify the existing Expo app still passes tests, lint, and type checks.

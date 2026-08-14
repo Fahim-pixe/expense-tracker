@@ -1,6 +1,6 @@
 # Native Android Validation Strategy
 
-The Kotlin app follows staged validation. **P0 checks are required before the Room foundation is considered production-ready.** The focused Compose flows and migration baseline now run on the existing native CI emulator; broader accessibility and scale checks remain separate release-quality gates.
+The Kotlin app follows staged validation. **P0 checks are required before the Room foundation is considered production-ready.** The focused Compose flows and migration baseline now run on the native instrumentation path; broader accessibility and scale checks remain separate release-quality gates.
 
 | Tier | Scope | Required now |
 | --- | --- | --- |
@@ -16,4 +16,4 @@ The Kotlin app follows staged validation. **P0 checks are required before the Ro
 4. Room-generated schema JSON is checked into `app/schemas` for the initial database version and for every later migration.
 5. A fresh checkout can run `./gradlew test lint assembleDebug` on an Android-capable runner.
 
-The repository includes a Gradle wrapper and native CI workflow. Local validation requires an installed Android SDK and Java 17; GitHub Actions provides the repeatable emulator execution path.
+The repository includes a Gradle wrapper and native CI build path. Local validation requires an installed Android SDK and Java 17; CI provides repeatable emulator execution.

@@ -6,7 +6,7 @@ This directory contains a **native Android implementation** of Expense Tracker, 
 | --- | --- |
 | Presentation | Jetpack Compose with a Material 3, phone-first interface. |
 | State | A lifecycle-aware `FinanceViewModel` that refreshes its immutable `FinanceState` after every ledger mutation. |
-| Persistence | Local Android `SharedPreferences`, storing only transaction, category, and currency data on the device. |
+| Persistence | Room local database for transactions, categories, and currency preference; `SharedPreferences` is retained only for one-time legacy import. |
 | Money logic | Amounts remain integer cents, preventing floating-point calculation drift. |
 | Minimum Android version | API 26 (Android 8.0), required for the Java time APIs used by monthly summaries. |
 
@@ -22,4 +22,4 @@ Open `android-kotlin` in a recent Android Studio release, allow Gradle to sync, 
 - [`docs/ROOM_MIGRATION.md`](./docs/ROOM_MIGRATION.md) documents the non-destructive legacy-ledger import and reset behavior.
 - [`docs/TESTING.md`](./docs/TESTING.md) separates required P0 validation from later instrumentation, UI, and performance suites.
 
-> The native module now includes a Gradle wrapper for reproducible Android Studio and CI builds. The sandbox still does not provide an Android SDK, so full native compilation is performed by Android Studio or GitHub Actions.
+> The Gradle wrapper and reproducible native CI configuration are added as part of the current P0 Room audit. Until then, Android Studio provides the supported local build path.

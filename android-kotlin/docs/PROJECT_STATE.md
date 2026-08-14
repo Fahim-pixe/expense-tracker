@@ -13,9 +13,9 @@ The Kotlin application is a **private, local-first** Android expense tracker. It
 | UI | Jetpack Compose and Material 3 screens, backed by `FinanceViewModel`. | Retained; state is consumed directly by the current Compose UI. |
 | State | Mutable Compose state refreshed from a Room-backed `Flow<FinanceState>`. | Appropriate for the present app size; no global mutable store. |
 | Domain | Immutable financial models using `Long` minor units. | Financial representation is suitable for P0. |
-| Persistence | Room 2.7.2 with KSP, entities for transactions, categories, and singleton preferences. | Authoritative ledger store. |
+| Persistence | Room 2.7.2 with KSP and variant-safe schema export, entities for transactions, categories, and singleton preferences. | Authoritative ledger store. |
 | Legacy import | One-time validated import from the former `SharedPreferences` JSON ledger. | Preserved for data continuity; completion marker is written only after the Room transaction succeeds. |
-| Build tooling | Gradle Kotlin DSL with AGP 8.7.3, Kotlin 2.0.21, Compose, API 26 minimum, and the committed Gradle 8.9 wrapper. | `test lint assembleDebug` passes under Java 17. |
+| Build tooling | Gradle Kotlin DSL with AGP 8.7.3, Kotlin 2.0.21, Compose, API 26 minimum, committed Gradle 8.9 wrapper, and native CI. | Local Java 17 build, lint, unit tests, and instrumentation APK packaging pass. |
 
 ## Room audit decisions
 
@@ -27,18 +27,14 @@ The Room database separates transactions, categories, and currency preferences. 
 
 | Check | Evidence | Status |
 | --- | --- | --- |
-| Version-one schema | `app/schemas/com.fahimpixe.expensetracker.data.local.FinanceDatabase/1.json` is generated and committed. | Complete |
-| DAO runtime behavior | In-memory Room instrumentation coverage verifies transaction ordering and deletion, unique category identity, and currency preference upserts. | Compiles locally; executes on CI emulator |
-| Legacy import | Instrumentation coverage validates non-destructive import, malformed-record rejection, idempotency, and reset protection. | Compiles locally; executes on CI emulator |
-| Native build | `./gradlew test lint assembleDebug` succeeds with Java 17; the debug instrumentation APK also assembles. | Complete |
-| CI execution | The dedicated workflow runs build checks and `connectedDebugAndroidTest` on a stable headless API 29 emulator. | Complete — both workflow jobs passed for the audit commit. |
+| Version-one schema | `app/schemas/com.fahimpixe.expensetracker.data.local.FinanceDatabase/1.json` is generated for the Room v1 contract. | Ready to commit |
+| DAO runtime behavior | In-memory Room instrumentation coverage verifies ordering, deletion, unique category identity, and currency preference upserts. | Compiles locally; executes in native CI |
+| Legacy import | Instrumentation coverage validates non-destructive import, malformed-record rejection, idempotency, and reset protection. | Compiles locally; executes in native CI |
+| Compose interaction | Instrumentation coverage drives add, delete, and custom-category management through the real app. | Compiles locally; executes in native CI |
+| Migration safety | A version-one schema recreation test and explicit future-migration registry are committed with a version-two contract. | Compiles locally; executes in native CI |
+| Native build | `./gradlew test lint assembleDebug assembleDebugAndroidTest` succeeds with Java 17. | Complete locally |
+| CI execution | Dedicated workflow runs build checks and `connectedDebugAndroidTest` on a stable headless API 29 emulator. | Pending first pushed run |
 
 ## Quality validation status
 
-| Area | Current safeguard | Next required review |
-| --- | --- | --- |
-| Compose interactions | Instrumentation coverage drives add, delete, and custom-category flows in the real app. | Expand to validation, empty, rotation, and process-recreation states when those flows change. |
-| Database upgrades | Version-one schema is packaged for tests; an explicit migration registry and version-one recreation test are committed. | Every future version must register and test its migration contract. |
-| Accessibility and scale | A documented release-candidate cadence covers TalkBack, maximum text size, and deterministic 10,000-record ledger validation. | Run before relevant releases and before broader product expansion. |
-
-No new product capability is introduced by this milestone. The local-first foundation remains green with an expanded quality gate for interaction, migration, accessibility, and scale work.
+The native quality record now specifies release-candidate accessibility coverage for TalkBack and large text, plus deterministic large-ledger validation before changes to list, search, summary, or persistence behavior. No new product capability is introduced by this milestone.

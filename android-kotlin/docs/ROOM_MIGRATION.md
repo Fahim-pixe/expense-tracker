@@ -4,7 +4,7 @@
 
 The native Android ledger now uses Room as its on-device source of truth. The initial schema stores transactions, categories, and the selected currency in separate indexed tables. Monetary values remain `Long` minor units.
 
-The build uses Room **2.7.2** with KSP. This matches the project’s Kotlin 2.0 baseline; the official Room release notes recommend KSP for Kotlin sources and state that Room 2.7+ targets Kotlin 2.0 with KSP2 support.[1]
+The build uses Room **2.7.2** with KSP and Room’s Gradle schema plugin. This stable processor configuration exports variant-safe schema JSON while preserving the Kotlin 2.0 baseline.[1]
 
 ## Legacy-data import
 
@@ -18,9 +18,9 @@ Reset clears Room records, restores default categories and USD, and removes the 
 
 ## Validation
 
-The native suite includes Room persistence contract coverage for stable transaction identity, integer minor-unit amounts, default-category identity, and the singleton currency preference. The P0 command is `./gradlew test lint assembleDebug`; the Room instrumentation suite runs with `./gradlew connectedDebugAndroidTest` on an emulator or the native CI workflow.
+The native unit suite includes Room persistence contract coverage for stable transaction identity, integer minor-unit amounts, default-category identity, and the singleton currency preference. The committed wrapper supports `./gradlew test lint assembleDebug`; the Android instrumentation suite runs with `./gradlew connectedDebugAndroidTest` on an emulator or CI runner.
 
-The committed version-one schema is also packaged into the instrumentation assets. `FinanceDatabaseMigrationScaffoldTest` recreates and validates that baseline with representative category, transaction, and currency records. Before any schema version increase, follow [`MIGRATION_CONTRACT.md`](./MIGRATION_CONTRACT.md) and extend that test with the new upgrade path.
+The committed version-one schema is packaged into the instrumentation assets. `FinanceDatabaseMigrationScaffoldTest` recreates and validates that baseline with representative category, transaction, and currency records. Before any schema version increase, follow [`MIGRATION_CONTRACT.md`](./MIGRATION_CONTRACT.md) and extend that test with the new upgrade path.
 
 ## References
 
