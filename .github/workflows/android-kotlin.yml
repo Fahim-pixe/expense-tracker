@@ -64,9 +64,7 @@ jobs:
           api-level: 29
           arch: x86_64
           script: |
-            cd android-kotlin
-            chmod +x gradlew
-            ./gradlew --no-daemon connectedDebugAndroidTest
+            cd android-kotlin && chmod +x gradlew && ./gradlew --no-daemon connectedDebugAndroidTest
       - name: Upload instrumentation reports
         if: always()
         uses: actions/upload-artifact@v4
