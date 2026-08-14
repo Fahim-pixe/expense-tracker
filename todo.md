@@ -12,3 +12,4 @@
 - [x] Add deterministic tests for ledger calculations and storage behavior.
 - [x] Run type checks, tests, and validate the core user flows.
 - [x] Publish the completed project source to a new private GitHub repository.
+- [x] Reimplement Expense Tracker as a native Kotlin Android application.
