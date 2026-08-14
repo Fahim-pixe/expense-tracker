@@ -6,9 +6,8 @@ import { financeUi } from "@/constants/finance-ui";
 import { SegmentedControl, SurfaceCard } from "@/components/finance-ui";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
+import { SUPPORTED_CURRENCIES, type CurrencyCode } from "@/lib/finance";
 import { useFinance } from "@/lib/finance-store";
-
-type Currency = "USD" | "EUR" | "GBP";
 
 export default function SettingsScreen() {
   const colors = useColors();
@@ -16,8 +15,11 @@ export default function SettingsScreen() {
   const confirmReset = () => {
     Alert.alert("Reset local data?", "All entries and custom categories on this device will be permanently removed.", [
       { text: "Cancel", style: "cancel" },
-      { text: "Reset", style: "destructive", onPress: resetData },
+      { text: "Reset", style: "destructive", onPress: () => { void resetData().then((didReset) => { if (!didReset) Alert.alert("Couldn’t reset data", "Your ledger was not changed. Please try again."); }); } },
     ]);
+  };
+  const updateCurrency = (currencyCode: CurrencyCode) => {
+    void updatePreferences({ currencyCode }).then((didUpdate) => { if (!didUpdate) Alert.alert("Couldn’t update currency", "Your display currency was not changed. Please try again."); });
   };
   const rows = [
     { id: "categories", icon: "category" as const, title: "Manage categories", detail: `${categories.length} categories`, action: () => router.push("/categories") },
@@ -35,11 +37,11 @@ export default function SettingsScreen() {
             <Text style={[styles.title, { color: colors.foreground }]}>Settings</Text>
             <Text style={[styles.subtitle, { color: colors.muted }]}>Make the ledger feel like your own.</Text>
             <Text style={[styles.sectionLabel, { color: colors.muted }]}>DISPLAY CURRENCY</Text>
-            <SegmentedControl<Currency> value={preferences.currencyCode as Currency} onChange={(currencyCode) => updatePreferences({ currencyCode })} options={[{ label: "USD", value: "USD" }, { label: "EUR", value: "EUR" }, { label: "GBP", value: "GBP" }]} />
+            <SegmentedControl<CurrencyCode> value={preferences.currencyCode} onChange={updateCurrency} options={SUPPORTED_CURRENCIES.map((currency) => ({ label: currency.label, value: currency.code }))} />
             <Text style={[styles.sectionLabel, { color: colors.muted }]}>YOUR DATA</Text>
           </>
         }
-        renderItem={({ item }) => <Pressable onPress={item.action} style={({ pressed }) => [styles.settingRow, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { opacity: financeUi.opacity.pressed }]}><View style={[styles.settingIcon, { backgroundColor: item.destructive ? `${colors.error}14` : `${colors.primary}12` }]}><MaterialIcons name={item.icon} size={21} color={item.destructive ? colors.error : colors.primary} /></View><View style={styles.settingText}><Text style={[styles.settingTitle, { color: item.destructive ? colors.error : colors.foreground }]}>{item.title}</Text><Text style={[styles.settingDetail, { color: colors.muted }]}>{item.detail}</Text></View><MaterialIcons name="chevron-right" size={22} color={colors.muted} /></Pressable>}
+        renderItem={({ item }) => <Pressable accessibilityRole="button" accessibilityLabel={item.title} accessibilityHint={item.detail} onPress={item.action} style={({ pressed }) => [styles.settingRow, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { opacity: financeUi.opacity.pressed }]}><View style={[styles.settingIcon, { backgroundColor: item.destructive ? `${colors.error}14` : `${colors.primary}12` }]}><MaterialIcons name={item.icon} size={21} color={item.destructive ? colors.error : colors.primary} /></View><View style={styles.settingText}><Text style={[styles.settingTitle, { color: item.destructive ? colors.error : colors.foreground }]}>{item.title}</Text><Text style={[styles.settingDetail, { color: colors.muted }]}>{item.detail}</Text></View><MaterialIcons name="chevron-right" size={22} color={colors.muted} /></Pressable>}
         ListFooterComponent={<SurfaceCard style={styles.privacyCard}><View style={[styles.privacyIcon, { backgroundColor: `${colors.success}16` }]}><MaterialIcons name="phone-iphone" size={21} color={colors.success} /></View><View style={styles.privacyText}><Text style={[styles.privacyTitle, { color: colors.foreground }]}>Private by default</Text><Text style={[styles.privacyDescription, { color: colors.muted }]}>Your ledger lives on this device. This version does not require an account or upload your transactions.</Text></View></SurfaceCard>}
       />
     </ScreenContainer>

@@ -7,11 +7,11 @@ import { financeUi } from "@/constants/finance-ui";
 import { AmountText, CategoryIcon, EmptyState, PageLoader, SectionTitle, SurfaceCard } from "@/components/finance-ui";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
-import { calculateTotals, formatMoney, getCategoryTotals, getMonthTransactions, type FinanceTransaction } from "@/lib/finance";
+import { calculateTotals, formatMoney, getCategoryTotals, getLocalDateKey, getMonthTransactions, type FinanceTransaction } from "@/lib/finance";
 import { useFinance } from "@/lib/finance-store";
 
 function todayKey() {
-  return new Date().toISOString().slice(0, 10);
+  return getLocalDateKey();
 }
 
 export default function OverviewScreen() {
@@ -29,7 +29,7 @@ export default function OverviewScreen() {
     return Array.from({ length: 7 }, (_, offset) => {
       const day = new Date(today);
       day.setDate(today.getDate() - (6 - offset));
-      const key = day.toISOString().slice(0, 10);
+      const key = getLocalDateKey(day);
       const amountCents = transactions.filter((item) => item.type === "expense" && item.date === key).reduce((sum, item) => sum + item.amountCents, 0);
       return { key, label: new Intl.DateTimeFormat("en-US", { weekday: "narrow" }).format(day), amountCents };
     });

@@ -4,7 +4,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-nati
 
 import { financeUi } from "@/constants/finance-ui";
 import { useColors } from "@/hooks/use-colors";
-import { formatMoney, type FinanceCategory, type TransactionType } from "@/lib/finance";
+import { formatMoney, type CurrencyCode, type FinanceCategory, type TransactionType } from "@/lib/finance";
 
 export function CategoryIcon({ category, size = financeUi.size.category }: { category: FinanceCategory; size?: number }) {
   return (
@@ -14,7 +14,7 @@ export function CategoryIcon({ category, size = financeUi.size.category }: { cat
   );
 }
 
-export function AmountText({ amountCents, currencyCode, type, size = "regular" }: { amountCents: number; currencyCode: string; type?: TransactionType; size?: "large" | "regular" | "small" }) {
+export function AmountText({ amountCents, currencyCode, type, size = "regular" }: { amountCents: number; currencyCode: CurrencyCode; type?: TransactionType; size?: "large" | "regular" | "small" }) {
   const colors = useColors();
   const color = type === "income" ? colors.success : type === "expense" ? colors.error : colors.foreground;
   return (
@@ -30,7 +30,7 @@ export function SectionTitle({ title, actionLabel, onAction }: { title: string; 
     <View style={styles.sectionTitleRow}>
       <Text style={[styles.sectionTitle, { color: colors.foreground }]}>{title}</Text>
       {actionLabel && onAction ? (
-        <Pressable onPress={onAction} style={({ pressed }) => [styles.textButton, pressed && { opacity: financeUi.opacity.pressed }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={actionLabel} onPress={onAction} style={({ pressed }) => [styles.textButton, pressed && { opacity: financeUi.opacity.pressed }]}>
           <Text style={[styles.textButtonText, { color: colors.primary }]}>{actionLabel}</Text>
         </Pressable>
       ) : null}
@@ -48,7 +48,7 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }: 
       <Text style={[styles.emptyTitle, { color: colors.foreground }]}>{title}</Text>
       <Text style={[styles.emptyDescription, { color: colors.muted }]}>{description}</Text>
       {actionLabel && onAction ? (
-        <Pressable onPress={onAction} style={({ pressed }) => [styles.emptyAction, { backgroundColor: colors.primary }, pressed && { opacity: financeUi.opacity.pressed }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={actionLabel} onPress={onAction} style={({ pressed }) => [styles.emptyAction, { backgroundColor: colors.primary }, pressed && { opacity: financeUi.opacity.pressed }]}>
           <Text style={[styles.emptyActionText, { color: colors.background }]}>{actionLabel}</Text>
         </Pressable>
       ) : null}
@@ -59,7 +59,7 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }: 
 export function PageLoader() {
   const colors = useColors();
   return (
-    <View style={styles.loader}>
+    <View accessibilityRole="progressbar" accessibilityLabel="Loading your ledger" style={styles.loader}>
       <ActivityIndicator size="small" color={colors.primary} />
     </View>
   );
@@ -68,11 +68,11 @@ export function PageLoader() {
 export function SegmentedControl<T extends string>({ value, options, onChange }: { value: T; options: { label: string; value: T }[]; onChange: (value: T) => void }) {
   const colors = useColors();
   return (
-    <View style={[styles.segmented, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <View accessibilityRole="tablist" style={[styles.segmented, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       {options.map((option) => {
         const selected = option.value === value;
         return (
-          <Pressable key={option.value} onPress={() => onChange(option.value)} style={({ pressed }) => [styles.segment, selected && { backgroundColor: colors.background }, pressed && { opacity: financeUi.opacity.pressed }]}>
+          <Pressable key={option.value} accessibilityRole="tab" accessibilityLabel={option.label} accessibilityState={{ selected }} onPress={() => onChange(option.value)} style={({ pressed }) => [styles.segment, selected && { backgroundColor: colors.background }, pressed && { opacity: financeUi.opacity.pressed }]}>
             <Text style={[styles.segmentText, { color: selected ? colors.foreground : colors.muted }, selected && styles.segmentTextSelected]}>{option.label}</Text>
           </Pressable>
         );

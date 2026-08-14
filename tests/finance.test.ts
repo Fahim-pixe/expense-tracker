@@ -4,7 +4,9 @@ import {
   DEFAULT_CATEGORIES,
   calculateTotals,
   getCategoryTotals,
+  getLocalDateKey,
   getMonthTransactions,
+  isValidDate,
   normalizeFinanceState,
   parseAmountToCents,
   type FinanceTransaction,
@@ -33,7 +35,19 @@ describe("finance ledger calculations", () => {
 
   it("parses a user-entered currency amount into minor units", () => {
     expect(parseAmountToCents("$18.75")).toBe(1875);
+    expect(parseAmountToCents("18.5")).toBe(1850);
+    expect(parseAmountToCents("18.567")).toBe(0);
     expect(parseAmountToCents("invalid")).toBe(0);
+  });
+
+  it("uses the device-local calendar date rather than a UTC date boundary", () => {
+    expect(getLocalDateKey(new Date(2026, 7, 4, 23, 59, 59))).toBe("2026-08-04");
+  });
+
+  it("accepts only real calendar dates", () => {
+    expect(isValidDate("2026-02-28")).toBe(true);
+    expect(isValidDate("2026-02-30")).toBe(false);
+    expect(isValidDate("2026-13-01")).toBe(false);
   });
 });
 
@@ -43,5 +57,25 @@ describe("persisted finance state", () => {
     expect(restored.transactions).toHaveLength(1);
     expect(restored.categories).toEqual(DEFAULT_CATEGORIES);
     expect(restored.preferences.currencyCode).toBe("EUR");
+  });
+
+  it("rejects malformed records, restores default categories, and protects ledger referential integrity", () => {
+    const restored = normalizeFinanceState({
+      categories: [
+        { id: "custom", name: "  Travel   fund ", icon: "label", color: "#3563E9", type: "expense", isDefault: false },
+        { id: "bad", name: "Bad color", icon: "label", color: "blue", type: "expense", isDefault: false },
+      ],
+      transactions: [
+        { ...transactions[0], categoryId: "custom" },
+        { ...transactions[1], amountCents: -10 },
+        { ...transactions[2], categoryId: "missing" },
+      ],
+      preferences: { currencyCode: "AUD" },
+    });
+
+    expect(restored.categories.find((category) => category.id === "custom")?.name).toBe("Travel fund");
+    expect(restored.categories.some((category) => category.id === "food" && category.isDefault)).toBe(true);
+    expect(restored.transactions).toEqual([]);
+    expect(restored.preferences.currencyCode).toBe("USD");
   });
 });

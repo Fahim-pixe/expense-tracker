@@ -18,12 +18,13 @@ export default function TransactionsScreen() {
   const { transactions, categories, preferences, deleteTransaction, isReady } = useFinance();
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
+  const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
 
   const rows = useMemo<LedgerRow[]>(() => {
     const visible = transactions
       .filter((item) => filter === "all" || item.type === filter)
       .filter((item) => {
-        const categoryName = categories.find((category) => category.id === item.categoryId)?.name ?? "";
+        const categoryName = categoryById.get(item.categoryId)?.name ?? "";
         return `${item.note} ${categoryName}`.toLowerCase().includes(query.trim().toLowerCase());
       })
       .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
@@ -32,12 +33,12 @@ export default function TransactionsScreen() {
       result.push({ kind: "transaction", id: transaction.id, transaction });
       return result;
     }, []);
-  }, [categories, filter, query, transactions]);
+  }, [categoryById, filter, query, transactions]);
 
   const confirmDelete = (transaction: FinanceTransaction) => {
     Alert.alert("Delete transaction?", "This will remove the entry from your on-device ledger.", [
       { text: "Cancel", style: "cancel" },
-      { text: "Delete", style: "destructive", onPress: () => deleteTransaction(transaction.id) },
+      { text: "Delete", style: "destructive", onPress: () => { void deleteTransaction(transaction.id).then((didDelete) => { if (!didDelete) Alert.alert("Couldn’t delete transaction", "Your entry was not changed. Please try again."); }); } },
     ]);
   };
 
@@ -50,6 +51,12 @@ export default function TransactionsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews
+        initialNumToRender={16}
+        maxToRenderPerBatch={16}
+        windowSize={7}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
         ListHeaderComponent={
           <View>
             <View style={styles.titleRow}>
@@ -63,7 +70,7 @@ export default function TransactionsScreen() {
             </View>
             <View style={[styles.searchBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <MaterialIcons name="search" size={20} color={colors.muted} />
-              <TextInput value={query} onChangeText={setQuery} placeholder="Search notes or categories" placeholderTextColor={colors.muted} style={[styles.searchInput, { color: colors.foreground }]} returnKeyType="done" />
+              <TextInput value={query} onChangeText={setQuery} placeholder="Search notes or categories" placeholderTextColor={colors.muted} accessibilityLabel="Search transactions" style={[styles.searchInput, { color: colors.foreground }]} returnKeyType="done" />
               {query ? <Pressable onPress={() => setQuery("")} accessibilityLabel="Clear search" style={({ pressed }) => [styles.clearSearch, pressed && { opacity: financeUi.opacity.pressed }]}><MaterialIcons name="close" size={18} color={colors.muted} /></Pressable> : null}
             </View>
             <SegmentedControl value={filter} onChange={setFilter} options={[{ label: "All", value: "all" }, { label: "Income", value: "income" }, { label: "Expenses", value: "expense" }]} />
@@ -71,17 +78,20 @@ export default function TransactionsScreen() {
         }
         renderItem={({ item }) => {
           if (item.kind === "date") return <Text style={[styles.dateHeader, { color: colors.muted }]}>{item.label}</Text>;
-          const category = categories.find((entry) => entry.id === item.transaction.categoryId);
+          const category = categoryById.get(item.transaction.categoryId);
           if (!category) return null;
           return (
-            <Pressable onLongPress={() => confirmDelete(item.transaction)} accessibilityLabel={`Delete ${item.transaction.note || category.name}`} style={({ pressed }) => [styles.transactionRow, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { opacity: financeUi.opacity.pressed }]}>
+            <View accessibilityLabel={`${item.transaction.type === "income" ? "Income" : "Expense"}: ${item.transaction.note || category.name}, ${item.transaction.date}`} style={[styles.transactionRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <CategoryIcon category={category} />
               <View style={styles.transactionContent}>
                 <Text style={[styles.transactionTitle, { color: colors.foreground }]} numberOfLines={1}>{item.transaction.note || category.name}</Text>
-                <Text style={[styles.transactionMeta, { color: colors.muted }]}>{category.name} · Hold to delete</Text>
+                <Text style={[styles.transactionMeta, { color: colors.muted }]}>{category.name} · {item.transaction.date}</Text>
               </View>
               <AmountText amountCents={item.transaction.amountCents} currencyCode={preferences.currencyCode} type={item.transaction.type} size="small" />
-            </Pressable>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${item.transaction.note || category.name}`} accessibilityHint="Permanently removes this transaction after confirmation" onPress={() => confirmDelete(item.transaction)} style={({ pressed }) => [styles.deleteButton, pressed && { opacity: financeUi.opacity.pressed }]}>
+                <MaterialIcons name="delete-outline" size={20} color={colors.error} />
+              </Pressable>
+            </View>
           );
         }}
         ListEmptyComponent={<EmptyState icon="search-off" title="Nothing found" description={query ? "Try a different note or category name." : "Record your first transaction to build your activity ledger."} actionLabel={query ? undefined : "Add transaction"} onAction={query ? undefined : () => router.push("/add")} />}
@@ -94,6 +104,7 @@ const styles = StyleSheet.create({
   addButton: { width: 46, height: 46, borderRadius: 23, alignItems: "center", justifyContent: "center" },
   clearSearch: { width: financeUi.size.tapTarget, height: financeUi.size.tapTarget, alignItems: "center", justifyContent: "center", marginRight: -7 },
   content: { padding: financeUi.spacing.page, paddingBottom: 34 },
+  deleteButton: { width: financeUi.size.tapTarget, height: financeUi.size.tapTarget, alignItems: "center", justifyContent: "center", marginRight: -9 },
   dateHeader: { fontSize: 12, lineHeight: 18, fontWeight: "800", letterSpacing: 0.6, marginTop: 21, marginBottom: 8, textTransform: "uppercase" },
   pressed: { opacity: financeUi.opacity.pressed, transform: [{ scale: 0.97 }] },
   searchBox: { height: 48, borderWidth: financeUi.line.subtle, borderRadius: financeUi.radius.button, paddingLeft: 13, paddingRight: 6, alignItems: "center", flexDirection: "row", marginBottom: 12 },
@@ -103,6 +114,6 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 19 },
   transactionContent: { flex: 1 },
   transactionMeta: { fontSize: 12, lineHeight: 17, marginTop: 2 },
-  transactionRow: { minHeight: 72, borderRadius: financeUi.radius.button, borderWidth: financeUi.line.subtle, paddingHorizontal: 12, marginBottom: 8, flexDirection: "row", alignItems: "center", gap: 11 },
+  transactionRow: { minHeight: 72, borderRadius: financeUi.radius.button, borderWidth: financeUi.line.subtle, paddingLeft: 12, paddingRight: 5, marginBottom: 8, flexDirection: "row", alignItems: "center", gap: 11 },
   transactionTitle: { fontSize: 15, lineHeight: 21, fontWeight: "700" },
 });

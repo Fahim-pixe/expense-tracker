@@ -3,6 +3,7 @@ import type MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export type TransactionType = "income" | "expense";
 export type MaterialIconName = ComponentProps<typeof MaterialIcons>["name"];
+export type CurrencyCode = "USD" | "EUR" | "GBP";
 
 export type FinanceCategory = {
   id: string;
@@ -24,7 +25,7 @@ export type FinanceTransaction = {
 };
 
 export type FinancePreferences = {
-  currencyCode: string;
+  currencyCode: CurrencyCode;
 };
 
 export type FinanceState = {
@@ -32,6 +33,16 @@ export type FinanceState = {
   categories: FinanceCategory[];
   preferences: FinancePreferences;
 };
+
+export const SUPPORTED_CURRENCIES = [
+  { code: "USD", label: "USD" },
+  { code: "EUR", label: "EUR" },
+  { code: "GBP", label: "GBP" },
+] as const satisfies readonly { code: CurrencyCode; label: string }[];
+
+export const MAX_TRANSACTION_CENTS = 999_999_999;
+export const MAX_CATEGORY_NAME_LENGTH = 32;
+export const MAX_TRANSACTION_NOTE_LENGTH = 160;
 
 export const DEFAULT_CATEGORIES: FinanceCategory[] = [
   { id: "food", name: "Food & dining", icon: "restaurant", color: "#F97316", type: "expense", isDefault: true },
@@ -48,19 +59,112 @@ export const DEFAULT_CATEGORIES: FinanceCategory[] = [
 ];
 
 export const DEFAULT_PREFERENCES: FinancePreferences = { currencyCode: "USD" };
-
 export const CATEGORY_COLORS = ["#3563E9", "#1FA971", "#F97316", "#A855F7", "#E55B5B", "#14B8A6"];
 
-export function createId(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function normalizeFinanceState(value: Partial<FinanceState>): FinanceState {
+function isTransactionType(value: unknown): value is TransactionType {
+  return value === "income" || value === "expense";
+}
+
+function isValidColor(value: unknown): value is string {
+  return typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value);
+}
+
+function isValidTimestamp(value: unknown): value is string {
+  return typeof value === "string" && !Number.isNaN(new Date(value).getTime());
+}
+
+function cleanText(value: unknown, maxLength: number) {
+  return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, maxLength) : "";
+}
+
+function cloneDefaultCategories() {
+  return DEFAULT_CATEGORIES.map((category) => ({ ...category }));
+}
+
+function normalizeCategory(value: unknown): FinanceCategory | null {
+  if (!isRecord(value) || typeof value.id !== "string" || !isTransactionType(value.type)) return null;
+  const name = cleanText(value.name, MAX_CATEGORY_NAME_LENGTH);
+  if (!value.id.trim() || !name || typeof value.icon !== "string" || !isValidColor(value.color)) return null;
+
   return {
-    transactions: Array.isArray(value.transactions) ? value.transactions : [],
-    categories: Array.isArray(value.categories) && value.categories.length ? value.categories : DEFAULT_CATEGORIES,
-    preferences: { ...DEFAULT_PREFERENCES, ...(value.preferences ?? {}) },
+    id: value.id.trim(),
+    name,
+    icon: value.icon as MaterialIconName,
+    color: value.color,
+    type: value.type,
+    isDefault: Boolean(value.isDefault),
   };
+}
+
+function normalizeTransaction(value: unknown): FinanceTransaction | null {
+  if (!isRecord(value) || typeof value.id !== "string" || typeof value.categoryId !== "string" || !isTransactionType(value.type)) return null;
+  const amountCents = value.amountCents;
+  const date = value.date;
+  const createdAt = value.createdAt;
+  if (!value.id.trim() || !value.categoryId.trim() || typeof date !== "string" || !isValidDate(date) || !isValidTimestamp(createdAt)) return null;
+  if (typeof amountCents !== "number" || !Number.isSafeInteger(amountCents) || amountCents <= 0 || amountCents > MAX_TRANSACTION_CENTS) return null;
+
+  return {
+    id: value.id.trim(),
+    type: value.type,
+    amountCents,
+    categoryId: value.categoryId.trim(),
+    note: cleanText(value.note, MAX_TRANSACTION_NOTE_LENGTH),
+    date,
+    createdAt,
+  };
+}
+
+export function createInitialFinanceState(): FinanceState {
+  return {
+    transactions: [],
+    categories: cloneDefaultCategories(),
+    preferences: { ...DEFAULT_PREFERENCES },
+  };
+}
+
+export function createId(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+export function isSupportedCurrency(value: unknown): value is CurrencyCode {
+  return SUPPORTED_CURRENCIES.some((currency) => currency.code === value);
+}
+
+export function normalizeFinanceState(value: unknown): FinanceState {
+  const source = isRecord(value) ? value : {};
+  const providedCategories = Array.isArray(source.categories) ? source.categories.map(normalizeCategory).filter((category): category is FinanceCategory => Boolean(category)) : [];
+  const normalizedCategories = new Map<string, FinanceCategory>();
+
+  for (const category of providedCategories) {
+    if (!normalizedCategories.has(category.id)) normalizedCategories.set(category.id, category);
+  }
+
+  for (const defaultCategory of cloneDefaultCategories()) {
+    normalizedCategories.set(defaultCategory.id, defaultCategory);
+  }
+
+  const categories = [...normalizedCategories.values()];
+  const categoryById = new Map(categories.map((category) => [category.id, category]));
+  const transactions = (Array.isArray(source.transactions) ? source.transactions : [])
+    .map(normalizeTransaction)
+    .filter((transaction): transaction is FinanceTransaction => Boolean(transaction))
+    .filter((transaction) => categoryById.get(transaction.categoryId)?.type === transaction.type);
+  const rawPreferences = isRecord(source.preferences) ? source.preferences : {};
+
+  return {
+    transactions,
+    categories,
+    preferences: { currencyCode: isSupportedCurrency(rawPreferences.currencyCode) ? rawPreferences.currencyCode : DEFAULT_PREFERENCES.currencyCode },
+  };
+}
+
+export function getLocalDateKey(value = new Date()) {
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
 }
 
 export function getMonthKey(value: Date | string) {
@@ -70,19 +174,21 @@ export function getMonthKey(value: Date | string) {
 
 export function formatMonth(value: Date | string) {
   const date = typeof value === "string" ? new Date(`${value}T12:00:00`) : value;
-  return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(date);
 }
 
 export function formatDate(value: string) {
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(
-    new Date(`${value}T12:00:00`),
-  );
+  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(new Date(`${value}T12:00:00`));
 }
 
-export function formatMoney(amountCents: number, currencyCode: string, options?: { signed?: boolean; compact?: boolean }) {
+export function getCurrencySymbol(currencyCode: CurrencyCode) {
+  return new Intl.NumberFormat(undefined, { style: "currency", currency: currencyCode, currencyDisplay: "narrowSymbol" }).formatToParts(0).find((part) => part.type === "currency")?.value ?? currencyCode;
+}
+
+export function formatMoney(amountCents: number, currencyCode: CurrencyCode, options?: { signed?: boolean; compact?: boolean }) {
   const prefix = options?.signed ? (amountCents > 0 ? "+" : amountCents < 0 ? "−" : "") : "";
   const amount = Math.abs(amountCents) / 100;
-  const formatter = new Intl.NumberFormat("en-US", {
+  const formatter = new Intl.NumberFormat(undefined, {
     style: "currency",
     currency: currencyCode,
     notation: options?.compact && amount >= 1000 ? "compact" : "standard",
@@ -92,9 +198,14 @@ export function formatMoney(amountCents: number, currencyCode: string, options?:
 }
 
 export function parseAmountToCents(input: string) {
-  const normalized = input.replace(/[^0-9.]/g, "");
-  if (!normalized || Number.isNaN(Number(normalized))) return 0;
-  return Math.round(Number(normalized) * 100);
+  const normalized = input.trim().replace(/[,$€£\s]/g, "");
+  const match = /^(\d+)(?:\.(\d{0,2}))?$/.exec(normalized);
+  if (!match) return 0;
+
+  const whole = Number(match[1]);
+  const fraction = Number((match[2] ?? "").padEnd(2, "0"));
+  const cents = whole * 100 + fraction;
+  return Number.isSafeInteger(cents) ? Math.min(cents, MAX_TRANSACTION_CENTS) : 0;
 }
 
 export function toAmountInput(amountCents: number) {
@@ -102,7 +213,13 @@ export function toAmountInput(amountCents: number) {
 }
 
 export function isValidDate(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(`${value}T12:00:00`).getTime());
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  return year >= 1900 && year <= 9999 && date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
 }
 
 export function getMonthTransactions(transactions: FinanceTransaction[], month: Date) {
@@ -136,12 +253,11 @@ export function getCategoryTotals(transactions: FinanceTransaction[], categories
 }
 
 export function getDateLabel(date: string) {
-  const today = new Date();
-  const todayKey = today.toISOString().slice(0, 10);
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  if (date === todayKey) return "Today";
-  if (date === yesterday.toISOString().slice(0, 10)) return "Yesterday";
+  const today = getLocalDateKey();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (date === today) return "Today";
+  if (date === getLocalDateKey(yesterday)) return "Yesterday";
   return formatDate(date);
 }
 
