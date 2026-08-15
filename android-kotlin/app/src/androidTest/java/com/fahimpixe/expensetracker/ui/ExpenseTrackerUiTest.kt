@@ -56,8 +56,8 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-settings").performClick()
         composeRule.onNodeWithTag("reset-local-data").performClick()
         composeRule.onNodeWithText("Reset").performClick()
+        waitForText("0 transactions stored")
         composeRule.onNodeWithTag("tab-overview").performClick()
-        waitForText("Start your ledger")
     }
 
     private fun waitForText(text: String) {
