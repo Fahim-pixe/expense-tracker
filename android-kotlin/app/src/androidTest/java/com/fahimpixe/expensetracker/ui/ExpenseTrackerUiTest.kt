@@ -2,6 +2,7 @@ package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -35,8 +36,9 @@ class ExpenseTrackerUiTest {
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForText("Activity")
-        waitForContentDescription("Delete UI flow lunch")
-        composeRule.onNodeWithContentDescription("Delete UI flow lunch").performClick()
+        waitForText("UI flow lunch")
+        waitForTag("delete-transaction-note-UI flow lunch")
+        composeRule.onNodeWithTag("delete-transaction-note-UI flow lunch").performClick()
         waitForText("Nothing found")
     }
 
@@ -48,9 +50,9 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("manage-categories").performClick()
         composeRule.onNodeWithTag("category-name").performTextInput("Office coffee")
         composeRule.onNodeWithTag("add-category").performClick()
-        waitForContentDescription("Remove Office coffee")
-        composeRule.onNodeWithContentDescription("Remove Office coffee").performClick()
-        waitForContentDescriptionAbsence("Remove Office coffee")
+        waitForTag("remove-category-Office coffee")
+        composeRule.onNodeWithTag("remove-category-Office coffee").performClick()
+        waitForTagAbsence("remove-category-Office coffee")
     }
 
     private fun resetLocalLedger() {
@@ -76,6 +78,18 @@ class ExpenseTrackerUiTest {
     private fun waitForContentDescriptionAbsence(description: String) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
             composeRule.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isEmpty()
+        }
+    }
+
+    private fun waitForTag(tag: String) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    private fun waitForTagAbsence(tag: String) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isEmpty()
         }
     }
 

@@ -250,7 +250,7 @@ private fun ManageCategoriesSheet(viewModel: FinanceViewModel, onDismiss: () -> 
                     if (category.isDefault) Text("Default", color = AppTokens.Muted, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 10.dp))
                     else IconButton(
                         onClick = { if (!viewModel.removeCategory(category.id)) error = "Categories in use cannot be removed." },
-                        modifier = Modifier.semantics { contentDescription = "Remove ${category.name}" },
+                        modifier = Modifier.testTag("remove-category-${category.name}").semantics { contentDescription = "Remove ${category.name}" },
                     ) {
                         Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                     }
