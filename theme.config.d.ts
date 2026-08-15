@@ -10,8 +10,14 @@ export const themeColors: {
   error: { light: string; dark: string };
 };
 
+export const appBrand: {
+  balanceShadow: string;
+  splashBackground: string;
+};
+
 declare const themeConfig: {
   themeColors: typeof themeColors;
+  appBrand: typeof appBrand;
 };
 
 export default themeConfig;

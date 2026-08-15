@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { localLedgerConfig } from "@/constants/app-config";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type PropsWithChildren } from "react";
 
 import {
@@ -23,7 +24,7 @@ import {
 } from "@/lib/finance";
 import { refreshBudgetWidget } from "@/lib/budget-widget";
 
-export const FINANCE_STORAGE_KEY = "expense-tracker:ledger:v1";
+export const FINANCE_STORAGE_KEY = localLedgerConfig.storageKey;
 
 type NewTransaction = Omit<FinanceTransaction, "id" | "createdAt" | "recurringScheduleId">;
 type NewRecurringTransaction = Omit<RecurringTransaction, "id" | "createdAt">;

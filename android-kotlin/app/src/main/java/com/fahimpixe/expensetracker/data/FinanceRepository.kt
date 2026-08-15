@@ -2,6 +2,7 @@ package com.fahimpixe.expensetracker.data
 
 import android.content.Context
 import androidx.room.withTransaction
+import com.fahimpixe.expensetracker.config.NativeAppConfig
 import com.fahimpixe.expensetracker.data.local.CategoryEntity
 import com.fahimpixe.expensetracker.data.local.FinanceDatabase
 import com.fahimpixe.expensetracker.data.local.LedgerPreferenceEntity
@@ -121,7 +122,7 @@ class FinanceRepository(
     }.getOrNull()?.takeIf { it.id.isNotBlank() && it.name.isNotBlank() }
 
     private companion object {
-        const val DEFAULT_CURRENCY = "USD"
+        const val DEFAULT_CURRENCY = NativeAppConfig.DEFAULT_CURRENCY
     }
 }
 
@@ -147,7 +148,7 @@ private class LegacyFinanceStorage(context: Context) {
             FinanceState(
                 transactions = root.optJSONArray("transactions").toTransactions(),
                 categories = root.optJSONArray("categories").toCategories().ifEmpty { CategoryCatalog.defaults },
-                currencyCode = root.optString("currencyCode", "USD"),
+                currencyCode = root.optString("currencyCode", NativeAppConfig.DEFAULT_CURRENCY),
             )
         }.getOrDefault(FinanceState())
     }
@@ -174,14 +175,14 @@ private class LegacyFinanceStorage(context: Context) {
                 val type = runCatching { TransactionType.valueOf(item.optString("type")) }.getOrNull() ?: continue
                 val id = item.optString("id")
                 val name = item.optString("name")
-                if (id.isNotBlank() && name.isNotBlank()) add(FinanceCategory(id, name, item.optString("icon", "label"), item.optLong("colorArgb", 0xFF3563E9), type, item.optBoolean("isDefault", true)))
+                if (id.isNotBlank() && name.isNotBlank()) add(FinanceCategory(id, name, item.optString("icon", "label"), item.optLong("colorArgb", NativeAppConfig.Brand.LEDGER_BLUE_ARGB), type, item.optBoolean("isDefault", true)))
             }
         }
     }
 
     private companion object {
-        const val PREFERENCES_NAME = "expense_tracker_ledger"
-        const val STORAGE_KEY = "ledger-v1"
-        const val MIGRATION_COMPLETE_KEY = "room_migration_v1_complete"
+        const val PREFERENCES_NAME = NativeAppConfig.LEGACY_PREFERENCES_NAME
+        const val STORAGE_KEY = NativeAppConfig.LEGACY_STORAGE_KEY
+        const val MIGRATION_COMPLETE_KEY = NativeAppConfig.LEGACY_MIGRATION_COMPLETE_KEY
     }
 }

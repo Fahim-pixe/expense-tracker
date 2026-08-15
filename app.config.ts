@@ -1,12 +1,14 @@
 // Load environment variables with proper priority (system > .env)
 import "./scripts/load-env.js";
 import type { ExpoConfig } from "expo/config";
+import { appIdentity, budgetWidgetConfig } from "./constants/app-config.js";
+import themeConfig from "./theme.config";
 
 // Bundle ID format: space.manus.<project_name_dots>.<timestamp>
 // e.g., "my-app" created at 2024-01-15 10:30:45 -> "space.manus.my.app.t20240115103045"
 // Bundle ID can only contain letters, numbers, and dots
 // Android requires each dot-separated segment to start with a letter
-const rawBundleId = "com.app.expensetracker";
+const rawBundleId = appIdentity.expoPackageId;
 const bundleId =
   rawBundleId
     .replace(/[-_]/g, ".") // Replace hyphens/underscores with dots
@@ -21,12 +23,16 @@ const bundleId =
       return /^[a-zA-Z]/.test(segment) ? segment : "x" + segment;
     })
     .join(".") || "space.manus.app";
-
+// Extract timestamp from bundle ID and prefix with "manus" for deep link scheme
+// e.g., "space.manus.my.app.t20240115103045" -> "manus20240115103045"
 const env = {
-  appName: "Expense Tracker",
-  appSlug: "expense-tracker",
+  // App branding - update these values directly (do not use env vars)
+  appName: appIdentity.name,
+  appSlug: appIdentity.slug,
+  // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
+  // Leave empty to use the default icon from assets/images/icon.png
   logoUrl: "/manus-storage/expense-tracker-icon_d049c122.png",
-  scheme: "expense-tracker",
+  scheme: appIdentity.scheme,
   iosBundleId: bundleId,
   androidPackage: bundleId,
 };
@@ -49,7 +55,7 @@ const config: ExpoConfig = {
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: "#3563E9",
+      backgroundColor: themeConfig.themeColors.primary.light,
       foregroundImage: "./assets/images/android-icon-foreground.png",
       backgroundImage: "./assets/images/android-icon-background.png",
       monochromeImage: "./assets/images/android-icon-monochrome.png",
@@ -83,9 +89,9 @@ const config: ExpoConfig = {
         image: "./assets/images/splash-icon.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#3563E9",
+        backgroundColor: themeConfig.appBrand.splashBackground,
         dark: {
-          backgroundColor: "#3563E9",
+          backgroundColor: themeConfig.appBrand.splashBackground,
         },
       },
     ],
@@ -103,15 +109,15 @@ const config: ExpoConfig = {
       {
         widgets: [
           {
-            name: "BudgetSnapshot",
+            name: budgetWidgetConfig.name,
             label: "Budget Snapshot",
             description: "Shows monthly spending, remaining budget, and category-limit alerts.",
-            minWidth: "180dp",
-            minHeight: "110dp",
-            targetCellWidth: 4,
-            targetCellHeight: 2,
+            minWidth: budgetWidgetConfig.minimumWidth,
+            minHeight: budgetWidgetConfig.minimumHeight,
+            targetCellWidth: budgetWidgetConfig.targetCellWidth,
+            targetCellHeight: budgetWidgetConfig.targetCellHeight,
             resizeMode: "horizontal|vertical",
-            updatePeriodMillis: 1800000,
+            updatePeriodMillis: budgetWidgetConfig.updatePeriodMillis,
           },
         ],
       },
@@ -123,9 +129,9 @@ const config: ExpoConfig = {
   },
   extra: {
     eas: {
-      projectId: "0464d96d-4603-4304-b2fa-56b92230fdc7"
-    }
-  }
+      projectId: "0464d96d-4603-4304-b2fa-56b92230fdc7",
+    },
+  },
 };
 
 export default config;

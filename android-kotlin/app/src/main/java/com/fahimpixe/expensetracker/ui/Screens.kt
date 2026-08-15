@@ -17,17 +17,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.outlined.TrendingDown
+import androidx.compose.material.icons.automirrored.outlined.TrendingUp
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.AddChart
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Insights
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material.icons.outlined.SearchOff
-import androidx.compose.material.icons.outlined.TrendingDown
-import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.fahimpixe.expensetracker.config.NativeAppConfig
 import androidx.compose.ui.unit.sp
 import com.fahimpixe.expensetracker.FinanceViewModel
 import com.fahimpixe.expensetracker.finance.CategoryTotal
@@ -214,7 +215,7 @@ fun SettingsScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier, o
             Text("DISPLAY CURRENCY", color = AppTokens.Muted, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("USD", "EUR", "GBP").forEach { code -> FilterChip(selected = state.currencyCode == code, onClick = { viewModel.setCurrency(code) }, label = { Text(code) }) }
+                NativeAppConfig.supportedCurrencies.forEach { code -> FilterChip(selected = state.currencyCode == code, onClick = { viewModel.setCurrency(code) }, label = { Text(code) }) }
             }
         }
         item {
@@ -385,7 +386,7 @@ private fun SummaryStats(summary: MonthlySummary, currencyCode: String, month: Y
                     Text("NET FOR ${month.month.getDisplayName(TextStyle.FULL, Locale.getDefault()).uppercase()}", color = AppTokens.Muted, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
                     Text(FinanceCalculator.formatCurrency(summary.balanceCents, currencyCode), color = if (summary.balanceCents >= 0) AppTokens.IncomeGreen else AppTokens.SpendCoral, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
                 }
-                Icon(if (summary.balanceCents >= 0) Icons.Outlined.TrendingUp else Icons.Outlined.TrendingDown, contentDescription = null, tint = if (summary.balanceCents >= 0) AppTokens.IncomeGreen else AppTokens.SpendCoral)
+                Icon(if (summary.balanceCents >= 0) Icons.AutoMirrored.Outlined.TrendingUp else Icons.AutoMirrored.Outlined.TrendingDown, contentDescription = null, tint = if (summary.balanceCents >= 0) AppTokens.IncomeGreen else AppTokens.SpendCoral)
             }
         }
     }
@@ -407,7 +408,7 @@ private fun MonthNavigator(month: YearMonth, onPrevious: () -> Unit, onNext: () 
         Row(modifier = Modifier.fillMaxWidth().height(50.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             IconButton(onClick = onPrevious) { Icon(Icons.Outlined.ArrowBackIosNew, contentDescription = "Previous month") }
             Text("${month.month.getDisplayName(TextStyle.FULL, Locale.getDefault())} ${month.year}", fontWeight = FontWeight.ExtraBold)
-            IconButton(onClick = onNext) { Icon(Icons.Outlined.ArrowForwardIos, contentDescription = "Next month") }
+            IconButton(onClick = onNext) { Icon(Icons.AutoMirrored.Outlined.ArrowForwardIos, contentDescription = "Next month") }
         }
     }
 }
@@ -454,7 +455,7 @@ private fun SettingsActionCard(
                 Text(title, color = if (tint == AppTokens.SpendCoral) tint else AppTokens.Ink, fontWeight = FontWeight.Bold)
                 Text(detail, color = AppTokens.Muted, style = MaterialTheme.typography.bodySmall)
             }
-            Icon(Icons.Outlined.ArrowForwardIos, contentDescription = null, tint = AppTokens.Muted, modifier = Modifier.size(16.dp))
+            Icon(Icons.AutoMirrored.Outlined.ArrowForwardIos, contentDescription = null, tint = AppTokens.Muted, modifier = Modifier.size(16.dp))
         }
     }
 }

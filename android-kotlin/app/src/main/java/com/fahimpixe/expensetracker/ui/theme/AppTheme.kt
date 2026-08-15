@@ -5,9 +5,10 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.fahimpixe.expensetracker.config.NativeAppConfig
 
 object AppTokens {
-    val LedgerBlue = Color(0xFF3563E9)
+    val LedgerBlue = Color(NativeAppConfig.Brand.LEDGER_BLUE_ARGB)
     val Ink = Color(0xFF111827)
     val Paper = Color(0xFFF7F8FC)
     val Surface = Color(0xFFFFFFFF)

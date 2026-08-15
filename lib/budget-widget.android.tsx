@@ -2,10 +2,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { FlexWidget, TextWidget, registerWidgetTaskHandler, requestPinWidget, requestWidgetUpdate } from "react-native-android-widget";
 
+import { appIdentity, budgetWidgetConfig, budgetWidgetVisualConfig } from "@/constants/app-config";
 import { FINANCE_STORAGE_KEY } from "@/lib/finance-store";
 import { calculateBudgetProgress, calculateTotals, formatMoney, getCategoryBudget, getCategoryTotals, getMonthKey, getMonthTransactions, getMonthlyBudget, normalizeFinanceState, type FinanceState } from "@/lib/finance";
 
-const WIDGET_NAME = "BudgetSnapshot";
+const WIDGET_NAME = budgetWidgetConfig.name;
 
 function buildWidget(state: FinanceState) {
   const month = new Date();
@@ -18,7 +19,7 @@ function buildWidget(state: FinanceState) {
   const categoryAlert = categoryTotals.map(({ category, amountCents }) => ({ category, progress: calculateBudgetProgress(amountCents, getCategoryBudget(state.categoryBudgets, monthKey, category.id)?.amountCents ?? 0) })).filter((item) => item.progress.isAtBudget).sort((a, b) => b.progress.percentUsed - a.progress.percentUsed)[0];
   const headline = budget ? (progress.isOverBudget ? `${formatMoney(Math.abs(progress.remainingCents), state.preferences.currencyCode)} over budget` : `${formatMoney(progress.remainingCents, state.preferences.currencyCode)} left this month`) : `${formatMoney(totals.expenseCents, state.preferences.currencyCode)} spent this month`;
   const alert = categoryAlert ? `${categoryAlert.category.name}: ${formatMoney(categoryAlert.progress.expenseCents, state.preferences.currencyCode)} of ${formatMoney(categoryAlert.progress.budgetCents, state.preferences.currencyCode)}` : budget ? `${formatMoney(progress.expenseCents, state.preferences.currencyCode)} of ${formatMoney(progress.budgetCents, state.preferences.currencyCode)} target` : "Set a monthly target in Budget";
-  return <FlexWidget clickAction="OPEN_URI" clickActionData={{ uri: "expense-tracker://budget" }} accessibilityLabel={`Budget Snapshot. ${headline}. ${alert}`} style={{ backgroundGradient: { from: "#3563E9", to: "#244EC2", orientation: "TL_BR" }, borderRadius: 18, padding: 16, height: "match_parent", width: "match_parent", justifyContent: "center" }}><TextWidget text="BUDGET SNAPSHOT" style={{ color: "#DDE7FF", fontSize: 10, fontWeight: "800", letterSpacing: 1 }} /><TextWidget text={headline} maxLines={1} style={{ color: "#FFFFFF", fontSize: 22, fontWeight: "800", marginTop: 4 }} /><TextWidget text={alert} maxLines={2} style={{ color: "#E7EEFF", fontSize: 12, marginTop: 8 }} /></FlexWidget>;
+  return <FlexWidget clickAction="OPEN_URI" clickActionData={{ uri: `${appIdentity.scheme}://${budgetWidgetConfig.deepLinkPath}` }} accessibilityLabel={`Budget Snapshot. ${headline}. ${alert}`} style={{ backgroundGradient: { from: budgetWidgetVisualConfig.gradientStart, to: budgetWidgetVisualConfig.gradientEnd, orientation: "TL_BR" }, borderRadius: 18, padding: 16, height: "match_parent", width: "match_parent", justifyContent: "center" }}><TextWidget text="BUDGET SNAPSHOT" style={{ color: budgetWidgetVisualConfig.overlineColor, fontSize: 10, fontWeight: "800", letterSpacing: 1 }} /><TextWidget text={headline} maxLines={1} style={{ color: budgetWidgetVisualConfig.primaryTextColor, fontSize: 22, fontWeight: "800", marginTop: 4 }} /><TextWidget text={alert} maxLines={2} style={{ color: budgetWidgetVisualConfig.secondaryTextColor, fontSize: 12, marginTop: 8 }} /></FlexWidget>;
 }
 
 async function loadWidgetState() {

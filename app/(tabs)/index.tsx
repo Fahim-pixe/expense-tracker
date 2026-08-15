@@ -9,6 +9,7 @@ import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
 import { calculateBudgetProgress, calculateTotals, formatMoney, getCategoryTotals, getLocalDateKey, getMonthKey, getMonthTransactions, getMonthlyBudget, type FinanceTransaction } from "@/lib/finance";
 import { useFinance } from "@/lib/finance-store";
+import { appBrand } from "@/theme.config";
 
 function todayKey() {
   return getLocalDateKey();
@@ -180,7 +181,7 @@ function TransactionRow({ item }: { item: FinanceTransaction }) {
 
 const styles = StyleSheet.create({
   addButton: { width: 46, height: 46, borderRadius: 23, alignItems: "center", justifyContent: "center" },
-  balanceCard: { borderRadius: 26, padding: 21, marginBottom: financeUi.spacing.section, shadowColor: "#1D3EA3", shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
+  balanceCard: { borderRadius: 26, padding: 21, marginBottom: financeUi.spacing.section, shadowColor: appBrand.balanceShadow, shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
   balanceDivider: { width: 1, height: 28 },
   balanceFooter: { flexDirection: "row", alignItems: "center", gap: 18, marginTop: 22 },
   balanceIcon: { width: 42, height: 42, borderRadius: 14, alignItems: "center", justifyContent: "center" },

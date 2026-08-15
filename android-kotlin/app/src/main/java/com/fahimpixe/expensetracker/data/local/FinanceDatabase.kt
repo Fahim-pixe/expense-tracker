@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
+import com.fahimpixe.expensetracker.config.NativeAppConfig
 
 @Database(
     entities = [TransactionEntity::class, CategoryEntity::class, LedgerPreferenceEntity::class],
@@ -18,7 +19,7 @@ abstract class FinanceDatabase : RoomDatabase() {
         fun create(context: Context): FinanceDatabase = Room.databaseBuilder(
             context.applicationContext,
             FinanceDatabase::class.java,
-            "expense-tracker.db",
+            NativeAppConfig.DATABASE_NAME,
         ).addMigrations(*FinanceDatabaseMigrations.all).build()
     }
 }

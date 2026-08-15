@@ -8,6 +8,7 @@ import java.time.YearMonth
 import java.util.Currency
 import java.util.Locale
 import java.util.UUID
+import com.fahimpixe.expensetracker.config.NativeAppConfig
 
 enum class TransactionType { EXPENSE, INCOME }
 
@@ -33,7 +34,7 @@ data class FinanceTransaction(
 data class FinanceState(
     val transactions: List<FinanceTransaction> = emptyList(),
     val categories: List<FinanceCategory> = CategoryCatalog.defaults,
-    val currencyCode: String = "USD",
+    val currencyCode: String = NativeAppConfig.DEFAULT_CURRENCY,
 )
 
 data class MonthlySummary(
@@ -63,7 +64,7 @@ object CategoryCatalog {
         FinanceCategory("other-income", "Other", "add_circle", 0xFF64748B, TransactionType.INCOME),
     )
 
-    val customColors = listOf(0xFF3563E9, 0xFF1FA971, 0xFFF97316, 0xFFA855F7, 0xFFE55B5B, 0xFF14B8A6)
+    val customColors = listOf(NativeAppConfig.Brand.LEDGER_BLUE_ARGB, 0xFF1FA971, 0xFFF97316, 0xFFA855F7, 0xFFE55B5B, 0xFF14B8A6)
 }
 
 object FinanceCalculator {

@@ -11,4 +11,9 @@ const themeColors = {
   error: { light: '#E55B5B', dark: '#F48282' },
 };
 
-module.exports = { themeColors };
+const appBrand = {
+  balanceShadow: '#1D3EA3',
+  splashBackground: themeColors.primary.light,
+};
+
+module.exports = { themeColors, appBrand };

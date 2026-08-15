@@ -1,6 +1,6 @@
 # Current Native Android Project State
 
-**Last updated:** Native quality validation milestone
+**Last updated:** Repository consistency audit
 
 ## Product boundary
 
@@ -38,3 +38,7 @@ The Room database separates transactions, categories, and currency preferences. 
 ## Quality validation status
 
 The native quality record now specifies release-candidate accessibility coverage for TalkBack and large text, plus deterministic large-ledger validation before changes to list, search, summary, or persistence behavior. No new product capability is introduced by this milestone.
+
+## Configuration consistency
+
+The native database name, legacy preference identifiers, migration marker, default currency, supported currencies, and primary brand color are centralized in `NativeAppConfig`. The separate Expo and Kotlin package identifiers intentionally identify different application artifacts; changes to either require an explicit release migration rather than a mechanical rename. The full cross-platform audit is recorded in [`../../docs/REPOSITORY_CONSISTENCY_AUDIT.md`](../../docs/REPOSITORY_CONSISTENCY_AUDIT.md).
