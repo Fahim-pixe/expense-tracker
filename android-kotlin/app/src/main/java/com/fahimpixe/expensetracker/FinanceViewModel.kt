@@ -22,10 +22,14 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
     var state by mutableStateOf(FinanceState(categories = CategoryCatalog.defaults))
         private set
 
+    var isInitialized by mutableStateOf(false)
+        private set
+
     init {
         viewModelScope.launch {
             repository.initialize()
             state = repository.snapshot()
+            isInitialized = true
             repository.state.collectLatest { state = it }
         }
     }

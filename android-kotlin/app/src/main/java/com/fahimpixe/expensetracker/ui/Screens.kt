@@ -129,7 +129,7 @@ fun ActivityScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier) {
     val grouped = remember(visible) { visible.groupBy { it.date }.toSortedMap(compareByDescending { it }) }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().statusBarsPadding(),
+        modifier = modifier.fillMaxSize().statusBarsPadding().testTag("activity-list"),
         contentPadding = PaddingValues(start = AppTokens.PagePadding, end = AppTokens.PagePadding, top = 16.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
