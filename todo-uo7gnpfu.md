@@ -76,3 +76,5 @@
 - [ ] Replace the flaky API 29 third-party emulator CI step with an Android Gradle Managed Device and verify connected instrumentation in GitHub Actions.
 
 - [ ] Repair the remaining Compose add/delete test selector and rerun the managed-device API 29 instrumentation gate.
+
+- [ ] Expose and verify a stable transaction-delete UI test seam for the managed-device Compose test.

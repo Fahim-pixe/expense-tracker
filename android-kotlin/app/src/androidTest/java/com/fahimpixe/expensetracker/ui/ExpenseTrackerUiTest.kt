@@ -36,8 +36,8 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
         waitForText("UI flow lunch")
-        waitForTag("delete-transaction-note-UI flow lunch", useUnmergedTree = true)
-        composeRule.onNodeWithTag("delete-transaction-note-UI flow lunch", useUnmergedTree = true).performClick()
+        waitForTag("delete-transaction-action", useUnmergedTree = true)
+        composeRule.onNodeWithTag("delete-transaction-action", useUnmergedTree = true).performClick()
         waitForAppReady()
         waitForText("Nothing found")
     }
