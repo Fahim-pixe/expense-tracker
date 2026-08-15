@@ -64,6 +64,10 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: gradle
+      - name: Enable KVM access for the Gradle-managed device
+        run: |
+          test -e /dev/kvm
+          sudo chmod a+rw /dev/kvm
       - name: Run instrumentation tests on the Gradle-managed API 29 device
         run: |
           chmod +x gradlew
