@@ -27,7 +27,7 @@ jobs:
         working-directory: android-kotlin
     steps:
       - name: Check out source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Set up Java 17
         uses: actions/setup-java@v5
         with:
@@ -40,7 +40,7 @@ jobs:
           ./gradlew --no-daemon test lint assembleDebug assembleDebugAndroidTest
       - name: Upload reports and generated Room schemas
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-kotlin-build-reports
           path: |
@@ -57,7 +57,7 @@ jobs:
         working-directory: android-kotlin
     steps:
       - name: Check out source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Set up Java 17
         uses: actions/setup-java@v5
         with:
@@ -65,7 +65,7 @@ jobs:
           java-version: "17"
           cache: gradle
       - name: Run instrumentation tests on API 29
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.38.0
         with:
           api-level: 29
           arch: x86_64
@@ -73,7 +73,7 @@ jobs:
             cd android-kotlin && chmod +x gradlew && ./gradlew --no-daemon connectedDebugAndroidTest
       - name: Upload instrumentation reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-kotlin-instrumentation-reports
           path: android-kotlin/app/build/reports/androidTests/**
@@ -94,7 +94,7 @@ jobs:
       NATIVE_ANDROID_KEY_PASSWORD: ${{ secrets.NATIVE_ANDROID_KEY_PASSWORD }}
     steps:
       - name: Check out source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Set up Java 17
         uses: actions/setup-java@v5
         with:
@@ -121,7 +121,7 @@ jobs:
             assembleRelease bundleRelease
           "$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)/apksigner" verify --verbose app/build/outputs/apk/release/app-release.apk
       - name: Upload signed release artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: native-kotlin-signed-release
           path: |
