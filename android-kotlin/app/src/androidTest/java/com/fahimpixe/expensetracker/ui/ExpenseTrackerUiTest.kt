@@ -1,6 +1,7 @@
 package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
@@ -20,7 +21,7 @@ class ExpenseTrackerUiTest {
     val composeRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun user_can_add_delete_and_manage_local_ledger_records() {
+    fun user_can_add_and_delete_a_local_ledger_record() {
         resetLocalLedger()
 
         composeRule.onNodeWithTag("add-transaction").performClick()
@@ -35,19 +36,20 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForText("UI flow lunch")
         composeRule.onNodeWithContentDescription("Delete transaction").performClick()
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("UI flow lunch").fetchSemanticsNodes().isEmpty()
-        }
+        waitForText("Nothing found")
+    }
+
+    @Test
+    fun user_can_add_and_remove_a_custom_category() {
+        resetLocalLedger()
 
         composeRule.onNodeWithTag("tab-settings").performClick()
         composeRule.onNodeWithTag("manage-categories").performClick()
         composeRule.onNodeWithTag("category-name").performTextInput("Office coffee")
         composeRule.onNodeWithTag("add-category").performClick()
-        waitForText("Office coffee")
+        waitForContentDescription("Remove Office coffee")
         composeRule.onNodeWithContentDescription("Remove Office coffee").performClick()
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithText("Office coffee").fetchSemanticsNodes().isEmpty()
-        }
+        waitForContentDescriptionAbsence("Remove Office coffee")
     }
 
     private fun resetLocalLedger() {
@@ -59,8 +61,24 @@ class ExpenseTrackerUiTest {
     }
 
     private fun waitForText(text: String) {
-        composeRule.waitUntil(timeoutMillis = 5_000) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
             composeRule.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty()
         }
+    }
+
+    private fun waitForContentDescription(description: String) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    private fun waitForContentDescriptionAbsence(description: String) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isEmpty()
+        }
+    }
+
+    private companion object {
+        const val EMULATOR_TIMEOUT_MILLIS = 15_000L
     }
 }

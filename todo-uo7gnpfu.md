@@ -59,4 +59,14 @@
 - [x] Checkpoint and commit the completed repository consistency audit to GitHub.
 - [x] Investigate the reported split-across-categories defect across creation, validation, persistence, rendering, and editing.
 - [x] Add regression coverage and implement a focused repair for split-across-categories behavior.
-- [ ] Validate, checkpoint, and commit the split-expense defect fix to GitHub.
+- [x] Validate, checkpoint, and commit the split-expense defect fix to GitHub.
+
+- [x] Fix split-expense mobile layout clipping at the left edge and validate the corrected safe-area behavior.
+- [x] Run split-expense regression checks and save a checkpoint for the UI fix.
+
+- [x] Reconcile the approved native Android modernization specification with the current repository records and document any required corrections or next milestone.
+- [ ] Correct the native CI status record and make the Room-and-Compose instrumentation flow deterministic on the API 29 emulator.
+- [x] Add focused rotation and process-recreation coverage for the Room-backed Compose ledger before the next native release candidate.
+- [ ] Establish native release-security evidence for signing, R8/minification, exported components, backup behavior, and production logging before a signed Kotlin release.
+- [ ] Implement the approved native stability milestone: deterministic emulator CI, lifecycle resilience coverage, and signed-release security evidence.
+- [ ] Provision protected native signing secrets in GitHub Actions and verify a manually dispatched signed APK/AAB release run.

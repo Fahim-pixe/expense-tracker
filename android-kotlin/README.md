@@ -18,8 +18,10 @@ Open `android-kotlin` in a recent Android Studio release, allow Gradle to sync, 
 
 ## Engineering records
 
-- [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) records the current native architecture, Room audit decisions, and remaining P0 work.
+- [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) records the current native architecture, Room audit decisions, and current validation status.
 - [`docs/ROOM_MIGRATION.md`](./docs/ROOM_MIGRATION.md) documents the non-destructive legacy-ledger import and reset behavior.
 - [`docs/TESTING.md`](./docs/TESTING.md) separates required P0 validation from later instrumentation, UI, and performance suites.
+- [`docs/PRODUCTION_MODERNIZATION_SPEC.md`](./docs/PRODUCTION_MODERNIZATION_SPEC.md) is the governing native modernization specification; [`docs/SPEC_ADOPTION_RECORD.md`](./docs/SPEC_ADOPTION_RECORD.md) records its repository-specific amendments and current release gates.
+- [`docs/RELEASE_SECURITY.md`](./docs/RELEASE_SECURITY.md) documents R8, backup, manifest, logging, and signed-release controls.
 
-> The Gradle wrapper and reproducible native CI configuration are added as part of the current P0 Room audit. Until then, Android Studio provides the supported local build path.
+> The Gradle wrapper and reproducible native CI configuration are committed. The current remote API 29 instrumentation run has a known Compose-test timeout, so native CI is not yet a green release gate; see `PROJECT_STATE.md` for the required correction.

@@ -5,7 +5,7 @@ The Kotlin app follows staged validation. **P0 checks are required before the Ro
 | Tier | Scope | Required now |
 | --- | --- | --- |
 | P0 — correctness and build | Financial unit tests; Room DAO tests; legacy import instrumentation test; schema export; `test`, `lint`, and `assembleDebug`. | Yes |
-| P1 — interaction reliability | Compose tests for add, delete, and category-management; remaining empty, validation, rotation, and process-recreation coverage. | Compose core flows are required now; remaining flows follow feature changes. |
+| P1 — interaction reliability | Compose tests for add, delete, category management, and configuration recreation; Room-backed process restart coverage; remaining empty and validation coverage. | The new lifecycle tests compile locally and must pass in the API 29 workflow; remaining flows follow feature changes. |
 | P2 — scale and resilience | Large-ledger performance, accessibility scans, migration regression suite, and low-end-device profiling. | Run to the cadence in `QUALITY_VALIDATION.md`. |
 
 ## P0 acceptance checks

@@ -6,6 +6,21 @@ plugins {
     id("androidx.room")
 }
 
+val nativeReleaseStoreFile = providers.gradleProperty("nativeReleaseStoreFile").orNull
+    ?: System.getenv("NATIVE_ANDROID_KEYSTORE_PATH")
+val nativeReleaseKeyAlias = providers.gradleProperty("nativeReleaseKeyAlias").orNull
+    ?: System.getenv("NATIVE_ANDROID_KEY_ALIAS")
+val nativeReleaseStorePassword = providers.gradleProperty("nativeReleaseStorePassword").orNull
+    ?: System.getenv("NATIVE_ANDROID_KEYSTORE_PASSWORD")
+val nativeReleaseKeyPassword = providers.gradleProperty("nativeReleaseKeyPassword").orNull
+    ?: System.getenv("NATIVE_ANDROID_KEY_PASSWORD")
+val nativeReleaseSigningConfigured = listOf(
+    nativeReleaseStoreFile,
+    nativeReleaseKeyAlias,
+    nativeReleaseStorePassword,
+    nativeReleaseKeyPassword,
+).all { !it.isNullOrBlank() }
+
 android {
     namespace = "com.fahimpixe.expensetracker"
     compileSdk = 35
@@ -23,11 +38,26 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            if (nativeReleaseSigningConfigured) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (nativeReleaseSigningConfigured) {
+                storeFile = file(nativeReleaseStoreFile!!)
+                storePassword = nativeReleaseStorePassword
+                keyAlias = nativeReleaseKeyAlias
+                keyPassword = nativeReleaseKeyPassword
+            }
         }
     }
 
