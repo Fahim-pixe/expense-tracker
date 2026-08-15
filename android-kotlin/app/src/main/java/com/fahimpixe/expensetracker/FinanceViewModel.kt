@@ -2,13 +2,14 @@ package com.fahimpixe.expensetracker
 
 import android.app.Application
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.fahimpixe.expensetracker.data.FinanceRepository
-import com.fahimpixe.expensetracker.finance.FinanceCalculator
 import com.fahimpixe.expensetracker.finance.CategoryCatalog
+import com.fahimpixe.expensetracker.finance.FinanceCalculator
 import com.fahimpixe.expensetracker.finance.FinanceState
 import com.fahimpixe.expensetracker.finance.FinanceTransaction
 import com.fahimpixe.expensetracker.finance.TransactionType
@@ -24,6 +25,10 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
 
     var isInitialized by mutableStateOf(false)
         private set
+
+    private var pendingMutations by mutableIntStateOf(0)
+    val isMutationIdle: Boolean
+        get() = isInitialized && pendingMutations == 0
 
     init {
         viewModelScope.launch {
@@ -47,7 +52,7 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
         val categoryMatchesType = state.categories.any { it.id == categoryId && it.type == type }
         if (amountCents <= 0 || date == null || !categoryMatchesType) return false
 
-        viewModelScope.launch {
+        launchMutation(onCompleted = onPersisted) {
             repository.addTransaction(
                 FinanceTransaction(
                     type = type,
@@ -57,50 +62,38 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
                     date = date.toString(),
                 ),
             )
-            refreshStateFromRepository()
-            onPersisted()
         }
         return true
     }
 
-    fun deleteTransaction(id: String) {
-        viewModelScope.launch {
-            repository.deleteTransaction(id)
-            refreshStateFromRepository()
-        }
-    }
+    fun deleteTransaction(id: String) = launchMutation { repository.deleteTransaction(id) }
 
-    fun addCategory(name: String, type: TransactionType) {
-        viewModelScope.launch {
-            repository.addCategory(name, type)
-            refreshStateFromRepository()
-        }
+    fun addCategory(name: String, type: TransactionType) = launchMutation {
+        repository.addCategory(name, type)
     }
 
     fun removeCategory(id: String): Boolean {
-        val removable = state.categories.firstOrNull { it.id == id }?.let { category -> !category.isDefault && state.transactions.none { it.categoryId == id } } == true
-        if (removable) viewModelScope.launch {
-            repository.removeCategory(id)
-            refreshStateFromRepository()
-        }
+        val removable = state.categories.firstOrNull { it.id == id }?.let { category ->
+            !category.isDefault && state.transactions.none { it.categoryId == id }
+        } == true
+        if (removable) launchMutation { repository.removeCategory(id) }
         return removable
     }
 
-    fun setCurrency(code: String) {
-        viewModelScope.launch {
-            repository.updateCurrency(code)
-            refreshStateFromRepository()
-        }
-    }
+    fun setCurrency(code: String) = launchMutation { repository.updateCurrency(code) }
 
-    fun resetData() {
-        viewModelScope.launch {
-            repository.reset()
-            refreshStateFromRepository()
-        }
-    }
+    fun resetData() = launchMutation { repository.reset() }
 
-    private suspend fun refreshStateFromRepository() {
-        state = repository.snapshot()
+    private fun launchMutation(onCompleted: () -> Unit = {}, mutation: suspend () -> Unit) {
+        pendingMutations += 1
+        viewModelScope.launch {
+            try {
+                mutation()
+                state = repository.snapshot()
+                onCompleted()
+            } finally {
+                pendingMutations -= 1
+            }
+        }
     }
 }

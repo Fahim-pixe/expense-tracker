@@ -36,12 +36,14 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("transaction-date").performTextInput("2026-08-14")
         composeRule.onNodeWithTag("save-transaction").performClick()
         waitForTagAbsence("save-transaction")
+        waitForAppReady()
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForText("Activity")
         waitForText("UI flow lunch")
         composeRule.onNodeWithTag("activity-list").performScrollToNode(hasTestTag("delete-transaction-note-UI flow lunch"))
         composeRule.onNodeWithTag("delete-transaction-note-UI flow lunch").performClick()
+        waitForAppReady()
         waitForText("Nothing found")
     }
 
@@ -55,6 +57,7 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("category-name").performTextInput("Office coffee")
         composeRule.onNodeWithTag("add-category").performClick()
         waitForTag("remove-category-Office coffee")
+        waitForAppReady()
         composeRule.onNodeWithTag("remove-category-Office coffee").performClick()
         waitForTagAbsence("remove-category-Office coffee")
     }

@@ -79,7 +79,7 @@ fun ExpenseTrackerApp(viewModel: FinanceViewModel) {
         AppTab("Settings") { Icon(Icons.Outlined.Settings, contentDescription = null) },
     )
 
-    Scaffold(modifier = Modifier.testTag(if (viewModel.isInitialized) "app-ready" else "app-loading"),
+    Scaffold(modifier = Modifier.testTag(if (viewModel.isMutationIdle) "app-ready" else "app-loading"),
         containerColor = AppTokens.Paper,
         bottomBar = {
             NavigationBar(containerColor = AppTokens.Surface) {
