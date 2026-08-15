@@ -72,3 +72,5 @@
 - [ ] Provision protected native signing secrets in GitHub Actions and verify a manually dispatched signed APK/AAB release run.
 
 - [x] Standardize all GitHub Actions workflows on Node.js 24, actions/setup-java@v5, and compatible current action versions; validate native and Expo CI.
+
+- [ ] Replace the flaky API 29 third-party emulator CI step with an Android Gradle Managed Device and verify connected instrumentation in GitHub Actions.

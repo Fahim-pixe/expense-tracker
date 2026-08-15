@@ -1,6 +1,6 @@
 # Current Native Android Project State
 
-**Last updated:** Native stability and release-security hardening
+**Last updated:** Android Gradle Managed Device migration
 
 ## Product boundary
 
@@ -15,7 +15,7 @@ The Kotlin application is a **private, local-first** Android expense tracker. It
 | Domain | Immutable financial models using `Long` minor units. | Financial representation is suitable for P0. |
 | Persistence | Room 2.7.2 with KSP and variant-safe schema export, entities for transactions, categories, and singleton preferences. | Authoritative ledger store. |
 | Legacy import | One-time validated import from the former `SharedPreferences` JSON ledger. | Preserved for data continuity; completion marker is written only after the Room transaction succeeds. |
-| Build tooling | Gradle Kotlin DSL with AGP 8.7.3, Kotlin 2.0.21, Compose, API 26 minimum, committed Gradle 8.9 wrapper, and native CI. | Local Java 17 build, lint, unit tests, and instrumentation APK packaging pass. |
+| Build tooling | Gradle Kotlin DSL with AGP 8.7.3, Kotlin 2.0.21, Compose, API 26 minimum, committed Gradle 8.9 wrapper, and native CI. | Local Java 17 build, lint, unit tests, instrumentation APK packaging, and Gradle Managed Device task discovery pass. |
 
 ## Room audit decisions
 
@@ -34,7 +34,7 @@ The Room database separates transactions, categories, and currency preferences. 
 | Lifecycle resilience | Compose instrumentation verifies configuration recreation retains the active transaction sheet and draft fields. A separate Room repository instrumentation test verifies persisted ledger recovery through a fresh database/repository instance. | Compiles locally; requires a successful post-change API 29 GitHub Actions run. |
 | Migration safety | A version-one schema recreation test and explicit future-migration registry are committed with a version-two contract. | Compiles locally; executes in native CI |
 | Native build | `./gradlew test lint assembleDebug assembleDebugAndroidTest` succeeds with Java 17. | Complete locally |
-| CI execution | Dedicated workflow runs build checks and `connectedDebugAndroidTest` on a headless API 29 emulator. | The former five-second combined-flow timeout is repaired in source; do not treat native CI as green until the replacement GitHub Actions run succeeds. |
+| CI execution | Dedicated workflow runs build checks and `api29DebugAndroidTest` against an Android Gradle Managed Device with animations disabled. | The Gradle task resolves locally; do not treat native CI as green until the replacement GitHub Actions run succeeds. |
 
 ## Quality validation status
 
@@ -42,7 +42,7 @@ The native quality record now specifies release-candidate accessibility coverage
 
 ### Current CI investigation
 
-The API 29 build/lint job passes remotely. The subsequent `connectedDebugAndroidTest` job remains blocked in `ExpenseTrackerUiTest` despite splitting the prior combined flow, adding stable action tags, extending the emulator wait budget, and publishing direct Room snapshots after mutations. The latest failed workflow is **31901789911** (commit `f89d0ac`); it times out while waiting for the Activity transaction action and custom-category removal state. This is a real release blocker. The next repair must introduce explicit initialization/mutation-idle coordination or refactor the UI test around a deterministic test seam; it must not be bypassed or relabeled as green.
+The API 29 build/lint job passes remotely. After the UI test synchronization repairs, the third-party emulator action became the confirmed blocker: failed runs including **31907757840** reported `emulator-5554 API level=1`, which prevented Gradle from installing the debug APK before any Compose test could execute. This occurred across multiple action versions and is an emulator-runner infrastructure failure, not an application-test failure. The workflow now uses Gradle's API 29 `Pixel 2` managed device (`api29DebugAndroidTest`) with animations disabled. The task resolves locally and awaits its first GitHub Actions execution; the release gate remains blocked until that run passes.
 
 ## Configuration consistency
 
@@ -54,4 +54,4 @@ The Kotlin release build now enables R8 and resource shrinking, disables Android
 
 ## CI toolchain policy
 
-All JavaScript workflows use Node.js 24 from the repository `.nvmrc` through `actions/setup-node@v7`; `package.json` constrains Node to `>=24 <25` and pnpm to `9.12.0`. Android workflows use Temurin Java 17 through `actions/setup-java@v5`; checkout and artifact actions use `@v7`, and the emulator runner is pinned to `v2.38.0`. Local Expo type checking, tests, lint, frozen-lockfile installation, workflow formatting, and native Java 17 build/test/lint/package validation passed after this change. The remote API 29 Compose instrumentation issue documented above remains independent of these runtime upgrades.
+All JavaScript workflows use Node.js 24 from the repository `.nvmrc` through `actions/setup-node@v7`; `package.json` constrains Node to `>=24 <25` and pnpm to `9.12.0`. Android workflows use Temurin Java 17 through `actions/setup-java@v5`; checkout and artifact actions use `@v7`. The native instrumentation job provisions its API 29 device through Android Gradle Managed Devices rather than a third-party emulator action. Local Expo type checking, tests, lint, frozen-lockfile installation, workflow formatting, and native Java 17 build/test/lint/package validation passed after this change. The remote API 29 managed-device instrumentation execution remains the final CI gate.

@@ -64,13 +64,10 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: gradle
-      - name: Run instrumentation tests on API 29
-        uses: reactivecircus/android-emulator-runner@v2.37.0
-        with:
-          api-level: 29
-          arch: x86_64
-          script: |
-            cd android-kotlin && chmod +x gradlew && ./gradlew --no-daemon connectedDebugAndroidTest
+      - name: Run instrumentation tests on the Gradle-managed API 29 device
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon :app:api29DebugAndroidTest
       - name: Upload instrumentation reports
         if: always()
         uses: actions/upload-artifact@v7
