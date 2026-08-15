@@ -1,6 +1,7 @@
 package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -351,9 +352,13 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
             )
             if (includeDelete) {
                 val deleteLabel = if (entry.note.isBlank()) "Delete ${category.name} transaction" else "Delete ${entry.note}"
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.testTag("delete-transaction-action").semantics { contentDescription = deleteLabel },
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .testTag("delete-transaction-action")
+                        .semantics { contentDescription = deleteLabel }
+                        .clickable(onClick = onDelete),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = AppTokens.SpendCoral)
                 }

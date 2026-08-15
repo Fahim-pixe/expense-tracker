@@ -1,13 +1,11 @@
 package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,10 +35,9 @@ class ExpenseTrackerUiTest {
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
-        composeRule.onNodeWithTag("activity-list").performScrollToNode(hasText("UI flow lunch"))
-        composeRule.waitForIdle()
-        waitForTag("delete-transaction-action", useUnmergedTree = true)
-        composeRule.onNodeWithTag("delete-transaction-action", useUnmergedTree = true).performClick()
+        waitForText("UI flow lunch")
+        waitForTag("delete-transaction-action")
+        composeRule.onNodeWithTag("delete-transaction-action").performClick()
         waitForAppReady()
         waitForText("Nothing found")
     }
@@ -77,9 +74,9 @@ class ExpenseTrackerUiTest {
         }
     }
 
-    private fun waitForTag(tag: String, useUnmergedTree: Boolean = false) {
+    private fun waitForTag(tag: String) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
-            composeRule.onAllNodesWithTag(tag, useUnmergedTree = useUnmergedTree).fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
         }
     }
 
