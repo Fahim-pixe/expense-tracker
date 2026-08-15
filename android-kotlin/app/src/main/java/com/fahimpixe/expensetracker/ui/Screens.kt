@@ -355,12 +355,10 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .testTag("delete-transaction-action")
-                        .semantics { contentDescription = deleteLabel }
                         .clickable(onClick = onDelete),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = AppTokens.SpendCoral)
+                    Icon(Icons.Outlined.DeleteOutline, contentDescription = deleteLabel, tint = AppTokens.SpendCoral)
                 }
             }
         }
