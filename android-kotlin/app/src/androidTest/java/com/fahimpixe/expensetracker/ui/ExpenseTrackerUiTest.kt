@@ -34,8 +34,9 @@ class ExpenseTrackerUiTest {
         waitForText("UI flow lunch")
 
         composeRule.onNodeWithTag("tab-activity").performClick()
-        waitForText("UI flow lunch")
-        composeRule.onNodeWithContentDescription("Delete transaction").performClick()
+        waitForText("Activity")
+        waitForContentDescription("Delete UI flow lunch")
+        composeRule.onNodeWithContentDescription("Delete UI flow lunch").performClick()
         waitForText("Nothing found")
     }
 

@@ -50,6 +50,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -348,8 +350,12 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
                 fontWeight = FontWeight.ExtraBold,
             )
             if (includeDelete) {
-                IconButton(onClick = onDelete, modifier = Modifier.testTag("delete-transaction-${entry.id}")) {
-                    Icon(Icons.Outlined.DeleteOutline, contentDescription = "Delete transaction", tint = AppTokens.SpendCoral)
+                val deleteLabel = if (entry.note.isBlank()) "Delete ${category.name} transaction" else "Delete ${entry.note}"
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.testTag("delete-transaction-${entry.id}").semantics { contentDescription = deleteLabel },
+                ) {
+                    Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = AppTokens.SpendCoral)
                 }
             }
         }

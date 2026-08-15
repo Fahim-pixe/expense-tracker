@@ -51,6 +51,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -246,7 +248,12 @@ private fun ManageCategoriesSheet(viewModel: FinanceViewModel, onDismiss: () -> 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     AssistChip(onClick = {}, label = { Text(category.name) }, leadingIcon = { Icon(Icons.Outlined.Category, contentDescription = null, modifier = Modifier.size(18.dp)) })
                     if (category.isDefault) Text("Default", color = AppTokens.Muted, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 10.dp))
-                    else IconButton(onClick = { if (!viewModel.removeCategory(category.id)) error = "Categories in use cannot be removed." }) { Icon(Icons.Outlined.DeleteOutline, contentDescription = "Remove ${category.name}", tint = MaterialTheme.colorScheme.error) }
+                    else IconButton(
+                        onClick = { if (!viewModel.removeCategory(category.id)) error = "Categories in use cannot be removed." },
+                        modifier = Modifier.semantics { contentDescription = "Remove ${category.name}" },
+                    ) {
+                        Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    }
                 }
             }
         }
