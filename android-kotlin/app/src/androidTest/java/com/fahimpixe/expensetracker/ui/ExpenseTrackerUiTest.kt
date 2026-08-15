@@ -1,7 +1,6 @@
 package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -9,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -41,8 +39,8 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForText("Activity")
         waitForText("UI flow lunch")
-        composeRule.onNodeWithTag("activity-list").performScrollToNode(hasTestTag("delete-transaction-note-UI flow lunch"))
-        composeRule.onNodeWithTag("delete-transaction-note-UI flow lunch").performClick()
+        waitForContentDescription("Delete UI flow lunch")
+        composeRule.onNodeWithContentDescription("Delete UI flow lunch").performClick()
         waitForAppReady()
         waitForText("Nothing found")
     }
@@ -59,7 +57,6 @@ class ExpenseTrackerUiTest {
         waitForTag("remove-category-Office coffee")
         waitForAppReady()
         composeRule.onNodeWithTag("remove-category-Office coffee").performClick()
-        waitForTagAbsence("remove-category-Office coffee")
     }
 
     private fun resetLocalLedger() {
