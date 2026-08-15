@@ -197,7 +197,7 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
 
             Button(
                 onClick = {
-                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = onDismiss)) Unit
+                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = {})) onDismiss()
                     else validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp).testTag("save-transaction"),
@@ -217,7 +217,8 @@ private fun ManageCategoriesSheet(viewModel: FinanceViewModel, onDismiss: () -> 
     val type = TransactionType.valueOf(typeName)
     var name by rememberSaveable { mutableStateOf("") }
     var error by rememberSaveable { mutableStateOf("") }
-    val categories = state.categories.filter { it.type == type }
+    var hiddenCategoryIds by rememberSaveable { mutableStateOf(emptySet<String>()) }
+    val categories = state.categories.filter { it.type == type && it.id !in hiddenCategoryIds }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         Column(
@@ -249,7 +250,7 @@ private fun ManageCategoriesSheet(viewModel: FinanceViewModel, onDismiss: () -> 
                     AssistChip(onClick = {}, label = { Text(category.name) }, leadingIcon = { Icon(Icons.Outlined.Category, contentDescription = null, modifier = Modifier.size(18.dp)) })
                     if (category.isDefault) Text("Default", color = AppTokens.Muted, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(top = 10.dp))
                     else IconButton(
-                        onClick = { if (!viewModel.removeCategory(category.id)) error = "Categories in use cannot be removed." },
+                        onClick = { if (viewModel.removeCategory(category.id)) hiddenCategoryIds += category.id else error = "Categories in use cannot be removed." },
                         modifier = Modifier.testTag("remove-category-${category.name}").semantics { contentDescription = "Remove ${category.name}" },
                     ) {
                         Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
