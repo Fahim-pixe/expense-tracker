@@ -70,3 +70,5 @@
 - [ ] Establish native release-security evidence for signing, R8/minification, exported components, backup behavior, and production logging before a signed Kotlin release.
 - [ ] Implement the approved native stability milestone: deterministic emulator CI, lifecycle resilience coverage, and signed-release security evidence.
 - [ ] Provision protected native signing secrets in GitHub Actions and verify a manually dispatched signed APK/AAB release run.
+
+- [x] Standardize all GitHub Actions workflows on Node.js 24, actions/setup-java@v5, and compatible current action versions; validate native and Expo CI.

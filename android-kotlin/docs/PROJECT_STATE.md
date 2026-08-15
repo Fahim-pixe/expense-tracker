@@ -40,6 +40,10 @@ The Room database separates transactions, categories, and currency preferences. 
 
 The native quality record now specifies release-candidate accessibility coverage for TalkBack and large text, plus deterministic large-ledger validation before changes to list, search, summary, or persistence behavior. Configuration recreation and Room-backed process restart now have focused instrumentation coverage. No new product capability is introduced by this milestone.
 
+### Current CI investigation
+
+The API 29 build/lint job passes remotely. The subsequent `connectedDebugAndroidTest` job remains blocked in `ExpenseTrackerUiTest` despite splitting the prior combined flow, adding stable action tags, extending the emulator wait budget, and publishing direct Room snapshots after mutations. The latest failed workflow is **31901789911** (commit `f89d0ac`); it times out while waiting for the Activity transaction action and custom-category removal state. This is a real release blocker. The next repair must introduce explicit initialization/mutation-idle coordination or refactor the UI test around a deterministic test seam; it must not be bypassed or relabeled as green.
+
 ## Configuration consistency
 
 The native database name, legacy preference identifiers, migration marker, default currency, supported currencies, and primary brand color are centralized in `NativeAppConfig`. The separate Expo and Kotlin package identifiers intentionally identify different application artifacts; changes to either require an explicit release migration rather than a mechanical rename. The full cross-platform audit is recorded in [`../../docs/REPOSITORY_CONSISTENCY_AUDIT.md`](../../docs/REPOSITORY_CONSISTENCY_AUDIT.md).
@@ -47,3 +51,7 @@ The native database name, legacy preference identifiers, migration marker, defau
 ## Release-security status
 
 The Kotlin release build now enables R8 and resource shrinking, disables Android platform backup, and supports external signing configuration without tracking a keystore or password. The manually dispatched signed-release workflow requires protected repository secrets, builds APK/AAB artifacts, and verifies the APK signature. Actual signing evidence remains pending until a repository administrator provisions the secrets and runs that workflow successfully; see [`RELEASE_SECURITY.md`](./RELEASE_SECURITY.md).
+
+## CI toolchain policy
+
+All JavaScript workflows use Node.js 24 from the repository `.nvmrc` through `actions/setup-node@v5`; `package.json` constrains Node to `>=24 <25` and pnpm to `9.12.0`. Android workflows use Temurin Java 17 through `actions/setup-java@v5`, while checkout and artifact actions are standardized on their current supported major versions. Local Expo type checking, tests, lint, frozen-lockfile installation, workflow formatting, and native Java 17 build/test/lint/package validation passed after this change. The remote API 29 Compose instrumentation issue documented above remains independent of these runtime upgrades.
