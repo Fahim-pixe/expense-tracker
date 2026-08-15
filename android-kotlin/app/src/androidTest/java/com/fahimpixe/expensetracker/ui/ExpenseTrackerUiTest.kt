@@ -34,10 +34,10 @@ class ExpenseTrackerUiTest {
         waitForAppReady()
 
         composeRule.onNodeWithTag("tab-activity").performClick()
-        waitForText("Activity")
+        waitForTag("activity-list")
         waitForText("UI flow lunch")
-        waitForTag("delete-transaction-note-UI flow lunch")
-        composeRule.onNodeWithTag("delete-transaction-note-UI flow lunch").performClick()
+        waitForTag("delete-transaction-note-UI flow lunch", useUnmergedTree = true)
+        composeRule.onNodeWithTag("delete-transaction-note-UI flow lunch", useUnmergedTree = true).performClick()
         waitForAppReady()
         waitForText("Nothing found")
     }
@@ -74,9 +74,9 @@ class ExpenseTrackerUiTest {
         }
     }
 
-    private fun waitForTag(tag: String) {
+    private fun waitForTag(tag: String, useUnmergedTree: Boolean = false) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
-            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+            composeRule.onAllNodesWithTag(tag, useUnmergedTree = useUnmergedTree).fetchSemanticsNodes().isNotEmpty()
         }
     }
 
