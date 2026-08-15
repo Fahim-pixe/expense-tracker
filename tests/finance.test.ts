@@ -10,6 +10,7 @@ import {
   getMonthTransactions,
   getNextRecurringDate,
   getNextRecurringRunDate,
+  groupTransactionsForActivity,
   isValidDate,
   normalizeFinanceState,
   parseAmountToCents,
@@ -55,6 +56,17 @@ describe("finance ledger calculations", () => {
   it("calculates remaining and overspent budget progress", () => {
     expect(calculateBudgetProgress(7500, 10000)).toMatchObject({ remainingCents: 2500, percentUsed: 75, isAtBudget: false, isOverBudget: false });
     expect(calculateBudgetProgress(12500, 10000)).toMatchObject({ remainingCents: -2500, percentUsed: 125, isAtBudget: true, isOverBudget: true });
+  });
+
+  it("groups complete split allocations into one activity purchase without hiding incomplete legacy entries", () => {
+    const grouped = groupTransactionsForActivity([
+      { ...transactions[1], id: "split-food", amountCents: 1800, splitGroupId: "split-lunch", splitIndex: 0, splitTotalCents: 3000 },
+      { ...transactions[2], id: "split-transport", amountCents: 1200, splitGroupId: "split-lunch", splitIndex: 1, splitTotalCents: 3000 },
+      { ...transactions[3], id: "legacy-incomplete", splitGroupId: "legacy", splitIndex: 0, splitTotalCents: 4100 },
+    ]);
+    expect(grouped).toHaveLength(2);
+    expect(grouped.find((item) => item.isSplit)).toMatchObject({ id: "split-split-lunch", amountCents: 3000, allocations: [{ id: "split-food" }, { id: "split-transport" }] });
+    expect(grouped.find((item) => !item.isSplit)).toMatchObject({ id: "legacy-incomplete", amountCents: 4100 });
   });
 
   it("advances monthly recurring dates without skipping short months", () => {

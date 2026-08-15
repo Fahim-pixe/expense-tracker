@@ -29,6 +29,14 @@ export type FinanceTransaction = {
   splitTotalCents?: number;
 };
 
+export type LedgerActivity = {
+  id: string;
+  transaction: FinanceTransaction;
+  allocations: FinanceTransaction[];
+  amountCents: number;
+  isSplit: boolean;
+};
+
 export type FinancePreferences = {
   currencyCode: CurrencyCode;
   biometricBackupProtection: boolean;
@@ -279,6 +287,28 @@ export function isValidDate(value: string) {
 export function getMonthTransactions(transactions: FinanceTransaction[], month: Date) {
   const monthKey = getMonthKey(month);
   return transactions.filter((transaction) => getMonthKey(transaction.date) === monthKey);
+}
+
+/** Groups a persisted split purchase so activity shows one user action, not one row per allocation. */
+export function groupTransactionsForActivity(transactions: FinanceTransaction[]): LedgerActivity[] {
+  const groups = new Map<string, FinanceTransaction[]>();
+  const standalone: FinanceTransaction[] = [];
+  for (const transaction of transactions) {
+    if (transaction.splitGroupId) groups.set(transaction.splitGroupId, [...(groups.get(transaction.splitGroupId) ?? []), transaction]);
+    else standalone.push(transaction);
+  }
+
+  const activity: LedgerActivity[] = standalone.map((transaction) => ({ id: transaction.id, transaction, allocations: [transaction], amountCents: transaction.amountCents, isSplit: false }));
+  for (const [groupId, entries] of groups) {
+    const allocations = [...entries].sort((a, b) => (a.splitIndex ?? 0) - (b.splitIndex ?? 0) || a.id.localeCompare(b.id));
+    if (allocations.length < 2) {
+      activity.push(...allocations.map((transaction) => ({ id: transaction.id, transaction, allocations: [transaction], amountCents: transaction.amountCents, isSplit: false } satisfies LedgerActivity)));
+      continue;
+    }
+    const total = allocations.reduce((sum, transaction) => sum + transaction.amountCents, 0);
+    activity.push({ id: `split-${groupId}`, transaction: allocations[0], allocations, amountCents: total, isSplit: true });
+  }
+  return activity.sort((a, b) => b.transaction.date.localeCompare(a.transaction.date) || b.transaction.createdAt.localeCompare(a.transaction.createdAt) || a.id.localeCompare(b.id));
 }
 
 export function calculateTotals(transactions: FinanceTransaction[]) {

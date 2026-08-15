@@ -7,11 +7,11 @@ import { financeUi } from "@/constants/finance-ui";
 import { AmountText, CategoryIcon, EmptyState, PageLoader, SegmentedControl } from "@/components/finance-ui";
 import { ScreenContainer } from "@/components/screen-container";
 import { useColors } from "@/hooks/use-colors";
-import { getDateLabel, type FinanceTransaction, type TransactionType } from "@/lib/finance";
+import { getDateLabel, groupTransactionsForActivity, type FinanceTransaction, type LedgerActivity, type TransactionType } from "@/lib/finance";
 import { useFinance } from "@/lib/finance-store";
 
 type Filter = "all" | TransactionType;
-type LedgerRow = { kind: "date"; id: string; label: string } | { kind: "transaction"; id: string; transaction: FinanceTransaction };
+type LedgerRow = { kind: "date"; id: string; label: string } | { kind: "transaction"; id: string; activity: LedgerActivity };
 
 export default function TransactionsScreen() {
   const colors = useColors();
@@ -21,16 +21,15 @@ export default function TransactionsScreen() {
   const categoryById = useMemo(() => new Map(categories.map((category) => [category.id, category])), [categories]);
 
   const rows = useMemo<LedgerRow[]>(() => {
-    const visible = transactions
-      .filter((item) => filter === "all" || item.type === filter)
+    const visible = groupTransactionsForActivity(transactions)
+      .filter((item) => filter === "all" || item.transaction.type === filter)
       .filter((item) => {
-        const categoryName = categoryById.get(item.categoryId)?.name ?? "";
-        return `${item.note} ${categoryName}`.toLowerCase().includes(query.trim().toLowerCase());
+        const categoryNames = item.allocations.map((allocation) => categoryById.get(allocation.categoryId)?.name ?? "").join(" ");
+        return `${item.transaction.note} ${categoryNames}`.toLowerCase().includes(query.trim().toLowerCase());
       })
-      .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
-    return visible.reduce<LedgerRow[]>((result, transaction, index) => {
-      if (index === 0 || visible[index - 1].date !== transaction.date) result.push({ kind: "date", id: `date-${transaction.date}`, label: getDateLabel(transaction.date) });
-      result.push({ kind: "transaction", id: transaction.id, transaction });
+    return visible.reduce<LedgerRow[]>((result, activity, index) => {
+      if (index === 0 || visible[index - 1].transaction.date !== activity.transaction.date) result.push({ kind: "date", id: `date-${activity.transaction.date}`, label: getDateLabel(activity.transaction.date) });
+      result.push({ kind: "transaction", id: activity.id, activity });
       return result;
     }, []);
   }, [categoryById, filter, query, transactions]);
@@ -79,20 +78,22 @@ export default function TransactionsScreen() {
         }
         renderItem={({ item }) => {
           if (item.kind === "date") return <Text style={[styles.dateHeader, { color: colors.muted }]}>{item.label}</Text>;
-          const category = categoryById.get(item.transaction.categoryId);
+          const transaction = item.activity.transaction;
+          const category = categoryById.get(transaction.categoryId);
           if (!category) return null;
-          const isSplit = Boolean(item.transaction.splitGroupId);
+          const isSplit = item.activity.isSplit;
+          const splitCategories = item.activity.allocations.map((allocation) => categoryById.get(allocation.categoryId)?.name ?? "Unknown category").join(" · ");
           return (
             <View style={[styles.transactionRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Pressable accessibilityRole="button" accessibilityLabel={`${isSplit ? "Edit split expense" : "Edit"} ${item.transaction.note || category.name}`} accessibilityHint={isSplit ? "Opens the full grouped expense for editing" : "Opens this transaction for editing"} onPress={() => isSplit ? router.push(`/edit-split/${item.transaction.splitGroupId}` as never) : router.push(`/edit/${item.transaction.id}` as never)} style={({ pressed }) => [styles.transactionEditButton, pressed && { opacity: financeUi.opacity.pressed }]}>
-                <CategoryIcon category={category} />
+              <Pressable accessibilityRole="button" accessibilityLabel={`${isSplit ? "Edit split expense" : "Edit"} ${transaction.note || category.name}`} accessibilityHint={isSplit ? "Opens the full grouped expense for editing" : "Opens this transaction for editing"} onPress={() => isSplit ? router.push(`/edit-split/${transaction.splitGroupId}` as never) : router.push(`/edit/${transaction.id}` as never)} style={({ pressed }) => [styles.transactionEditButton, pressed && { opacity: financeUi.opacity.pressed }]}>
+                {isSplit ? <View style={[styles.splitIcon, { backgroundColor: `${colors.primary}12` }]}><MaterialIcons name="call-split" size={21} color={colors.primary} /></View> : <CategoryIcon category={category} />}
                 <View style={styles.transactionContent}>
-                  <Text style={[styles.transactionTitle, { color: colors.foreground }]} numberOfLines={1}>{item.transaction.note || category.name}</Text>
-                  <Text style={[styles.transactionMeta, { color: colors.muted }]}>{isSplit ? `Split allocation · ${category.name}` : `${category.name} · ${item.transaction.date}`}</Text>
+                  <Text style={[styles.transactionTitle, { color: colors.foreground }]} numberOfLines={1}>{isSplit ? transaction.note || "Split expense" : transaction.note || category.name}</Text>
+                  <Text style={[styles.transactionMeta, { color: colors.muted }]} numberOfLines={1}>{isSplit ? `${item.activity.allocations.length} categories · ${splitCategories}` : `${category.name} · ${transaction.date}`}</Text>
                 </View>
-                <AmountText amountCents={item.transaction.amountCents} currencyCode={preferences.currencyCode} type={item.transaction.type} size="small" />
+                <AmountText amountCents={item.activity.amountCents} currencyCode={preferences.currencyCode} type={transaction.type} size="small" />
               </Pressable>
-              <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${item.transaction.note || category.name}`} accessibilityHint="Permanently removes this transaction after confirmation" onPress={() => confirmDelete(item.transaction)} style={({ pressed }) => [styles.deleteButton, pressed && { opacity: financeUi.opacity.pressed }]}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Delete ${transaction.note || category.name}`} accessibilityHint="Permanently removes this transaction after confirmation" onPress={() => confirmDelete(transaction)} style={({ pressed }) => [styles.deleteButton, pressed && { opacity: financeUi.opacity.pressed }]}>
                 <MaterialIcons name="delete-outline" size={20} color={colors.error} />
               </Pressable>
             </View>
@@ -113,6 +114,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: financeUi.opacity.pressed, transform: [{ scale: 0.97 }] },
   searchBox: { height: 48, borderWidth: financeUi.line.subtle, borderRadius: financeUi.radius.button, paddingLeft: 13, paddingRight: 6, alignItems: "center", flexDirection: "row", marginBottom: 12 },
   searchInput: { flex: 1, fontSize: 15, paddingHorizontal: 10, height: "100%" },
+  splitIcon: { width: 42, height: 42, borderRadius: financeUi.radius.icon, alignItems: "center", justifyContent: "center" },
   subtitle: { fontSize: 14, lineHeight: 20, marginTop: 1 },
   title: { fontSize: 28, lineHeight: 35, fontWeight: "800", letterSpacing: -0.6 },
   titleRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 19 },

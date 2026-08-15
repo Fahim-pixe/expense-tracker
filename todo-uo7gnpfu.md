@@ -56,4 +56,7 @@
 - [x] Audit recent Expo and native Kotlin changes for discrepancies, duplicate configuration, and inappropriate hardcoded values.
 - [x] Centralize confirmed configuration values and correct consistency defects without changing product behavior.
 - [x] Run full regression validation and document the repository consistency audit findings.
-- [ ] Checkpoint and commit the completed repository consistency audit to GitHub.
+- [x] Checkpoint and commit the completed repository consistency audit to GitHub.
+- [x] Investigate the reported split-across-categories defect across creation, validation, persistence, rendering, and editing.
+- [x] Add regression coverage and implement a focused repair for split-across-categories behavior.
+- [ ] Validate, checkpoint, and commit the split-expense defect fix to GitHub.

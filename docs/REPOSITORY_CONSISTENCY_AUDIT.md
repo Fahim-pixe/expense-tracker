@@ -24,3 +24,7 @@
 ## Validation evidence
 
 The audit completed with the Expo regression suite, lint, TypeScript check, and Expo Doctor green. The Kotlin module completed `test`, `lint`, and `assembleDebug` with Java 17. The audit did not change data schemas, financial arithmetic, export formats, or local storage key values.
+
+## Split-expense follow-up
+
+The activity list previously rendered one row for every stored split allocation even though edit and delete treated those allocations as a single purchase. The ledger now groups a complete split into one activity item, displays its full purchase total, exposes its category count, and opens the existing group editor. A regression test verifies that a two-category split produces one activity item while an incomplete legacy group remains visible as a standalone entry.
