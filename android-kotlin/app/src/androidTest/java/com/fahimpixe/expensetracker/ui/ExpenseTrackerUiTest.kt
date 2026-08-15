@@ -1,15 +1,16 @@
 package com.fahimpixe.expensetracker.ui
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fahimpixe.expensetracker.MainActivity
 import org.junit.Rule
@@ -38,8 +39,10 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
         waitForText("UI flow lunch")
-        waitForContentDescription("Delete UI flow lunch", useUnmergedTree = true)
-        composeRule.onNodeWithContentDescription("Delete UI flow lunch", useUnmergedTree = true).performClick()
+        waitForTag("activity-transaction-card")
+        composeRule.onNodeWithTag("activity-transaction-card").performTouchInput {
+            click(Offset(width - 24f, height / 2f))
+        }
         waitForAppReady()
         waitForText("Nothing found")
     }
@@ -73,12 +76,6 @@ class ExpenseTrackerUiTest {
     private fun waitForText(text: String) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
             composeRule.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty()
-        }
-    }
-
-    private fun waitForContentDescription(description: String, useUnmergedTree: Boolean = false) {
-        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
-            composeRule.onAllNodesWithContentDescription(description, useUnmergedTree = useUnmergedTree).fetchSemanticsNodes().isNotEmpty()
         }
     }
 
