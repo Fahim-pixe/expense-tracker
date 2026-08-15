@@ -32,7 +32,7 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("transaction-date").performTextClearance()
         composeRule.onNodeWithTag("transaction-date").performTextInput("2026-08-14")
         composeRule.onNodeWithTag("save-transaction").performClick()
-        waitForText("UI flow lunch")
+        waitForTagAbsence("save-transaction")
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForText("Activity")
@@ -60,6 +60,7 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("reset-local-data").performClick()
         composeRule.onNodeWithText("Reset").performClick()
         waitForText("0 transactions stored")
+        waitForText("11 categories")
         composeRule.onNodeWithTag("tab-overview").performClick()
     }
 
