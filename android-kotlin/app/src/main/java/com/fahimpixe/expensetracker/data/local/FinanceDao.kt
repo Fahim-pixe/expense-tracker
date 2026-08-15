@@ -17,6 +17,9 @@ interface FinanceDao {
     @Query("SELECT currencyCode FROM ledger_preferences WHERE id = 1")
     fun observeCurrencyCode(): Flow<String?>
 
+    @Query("SELECT currencyCode FROM ledger_preferences WHERE id = 1")
+    suspend fun currencyCode(): String?
+
     @Query("SELECT * FROM transactions ORDER BY date DESC, createdAtEpochMs DESC")
     suspend fun transactions(): List<TransactionEntity>
 

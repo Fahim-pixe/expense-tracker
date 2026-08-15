@@ -56,6 +56,12 @@ class FinanceRepository(
         if (migratedLegacyData) legacyStorage.markMigrated()
     }
 
+    suspend fun snapshot(): FinanceState = FinanceState(
+        transactions = dao.transactions().mapNotNull { it.toDomain() },
+        categories = dao.categories().mapNotNull { it.toDomain() }.ifEmpty { CategoryCatalog.defaults },
+        currencyCode = dao.currencyCode() ?: DEFAULT_CURRENCY,
+    )
+
     suspend fun addTransaction(transaction: FinanceTransaction) {
         dao.insertTransaction(transaction.toEntity())
     }

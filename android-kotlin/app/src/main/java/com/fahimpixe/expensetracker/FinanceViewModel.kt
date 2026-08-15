@@ -14,7 +14,6 @@ import com.fahimpixe.expensetracker.finance.FinanceTransaction
 import com.fahimpixe.expensetracker.finance.TransactionType
 import java.time.LocalDate
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class FinanceViewModel(application: Application) : AndroidViewModel(application) {
@@ -26,6 +25,7 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
     init {
         viewModelScope.launch {
             repository.initialize()
+            state = repository.snapshot()
             repository.state.collectLatest { state = it }
         }
     }
@@ -97,6 +97,6 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private suspend fun refreshStateFromRepository() {
-        state = repository.state.first()
+        state = repository.snapshot()
     }
 }
