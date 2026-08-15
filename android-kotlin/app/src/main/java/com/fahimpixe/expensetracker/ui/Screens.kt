@@ -51,10 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -355,18 +352,11 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
             )
             if (includeDelete) {
                 val deleteLabel = if (entry.note.isBlank()) "Delete ${category.name} transaction" else "Delete ${entry.note}"
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clearAndSetSemantics {
-                            contentDescription = deleteLabel
-                            role = Role.Button
-                        }
-                        .testTag("delete-transaction-action")
-                        .clickable(onClick = onDelete),
-                    contentAlignment = Alignment.Center,
+                IconButton(
+                    onClick = onDelete,
+                    modifier = Modifier.size(48.dp),
                 ) {
-                    Icon(Icons.Outlined.DeleteOutline, contentDescription = null, tint = AppTokens.SpendCoral)
+                    Icon(Icons.Outlined.DeleteOutline, contentDescription = deleteLabel, tint = AppTokens.SpendCoral)
                 }
             }
         }
