@@ -1,11 +1,13 @@
 package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -35,7 +37,8 @@ class ExpenseTrackerUiTest {
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
-        waitForText("UI flow lunch")
+        composeRule.onNodeWithTag("activity-list").performScrollToNode(hasText("UI flow lunch"))
+        composeRule.waitForIdle()
         waitForTag("delete-transaction-action", useUnmergedTree = true)
         composeRule.onNodeWithTag("delete-transaction-action", useUnmergedTree = true).performClick()
         waitForAppReady()
