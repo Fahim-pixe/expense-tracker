@@ -65,20 +65,20 @@
 - [x] Run split-expense regression checks and save a checkpoint for the UI fix.
 
 - [x] Reconcile the approved native Android modernization specification with the current repository records and document any required corrections or next milestone.
-- [ ] Correct the native CI status record and make the Room-and-Compose instrumentation flow deterministic on the API 29 emulator.
+- [x] Correct the native CI status record and make the Room-and-Compose instrumentation flow deterministic on the API 29 emulator.
 - [x] Add focused rotation and process-recreation coverage for the Room-backed Compose ledger before the next native release candidate.
 - [ ] Establish native release-security evidence for signing, R8/minification, exported components, backup behavior, and production logging before a signed Kotlin release.
 - [ ] Implement the approved native stability milestone: deterministic emulator CI, lifecycle resilience coverage, and signed-release security evidence.
 - [ ] Provision protected native signing secrets in GitHub Actions and verify a manually dispatched signed APK/AAB release run.
 
 - [x] Standardize all GitHub Actions workflows on Node.js 24, actions/setup-java@v5, and compatible current action versions; validate native and Expo CI.
-- [ ] Replace the flaky API 29 third-party emulator CI step with an Android Gradle Managed Device and verify connected instrumentation in GitHub Actions.
-- [ ] Repair the remaining Compose add/delete test selector and rerun the managed-device API 29 instrumentation gate.
-- [ ] Expose and verify a stable transaction-delete UI test seam for the managed-device Compose test.
-- [ ] Make the Activity list scroll deterministically to the created transaction before invoking its delete action in Compose instrumentation.
-- [ ] Drive the rendered Activity transaction-card delete affordance deterministically in the Compose instrumentation test.
-- [ ] Wait for the transaction modal to leave composition before asserting Activity test state.
-- [ ] Add an explicit Activity-screen readiness marker and use it to synchronize the native add/delete Compose test.
-- [ ] Refactor the Activity transaction-list item into a dedicated deterministic test contract for add/delete instrumentation.
-- [ ] Add a durable post-Room-mutation completion token and use it to synchronize native add/delete instrumentation.
-- [ ] Split the flaky add/delete Compose test into deterministic form smoke and seeded-ledger deletion coverage.
+- [x] Replace the flaky API 29 third-party emulator CI step with an Android Gradle Managed Device and verify connected instrumentation in GitHub Actions.
+- [x] Repair the remaining Compose add/delete test selector and rerun the managed-device API 29 instrumentation gate.
+- [x] Expose and verify a stable transaction-delete UI test seam for the managed-device Compose test.
+- [x] Make the Activity list scroll deterministically to the created transaction before invoking its delete action in Compose instrumentation.
+- [x] Drive the rendered Activity transaction-card delete affordance deterministically in the Compose instrumentation test.
+- [x] Wait for the transaction modal to leave composition before asserting Activity test state.
+- [x] Add an explicit Activity-screen readiness marker and use it to synchronize the native add/delete Compose test.
+- [x] Refactor the Activity transaction-list item into a dedicated deterministic test contract for add/delete instrumentation.
+- [x] Add a durable post-Room-mutation completion token and use it to synchronize native add/delete instrumentation.
+- [x] Split the flaky add/delete Compose test into deterministic form smoke and seeded-ledger deletion coverage.
