@@ -1,10 +1,8 @@
 package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -38,8 +36,8 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
         waitForText("UI flow lunch")
-        waitForContentDescription("Delete UI flow lunch")
-        composeRule.onNodeWithContentDescription("Delete UI flow lunch").performClick()
+        waitForTag("delete-transaction-action")
+        composeRule.onNodeWithTag("delete-transaction-action").performClick()
         waitForAppReady()
         waitForText("Nothing found")
     }
@@ -73,12 +71,6 @@ class ExpenseTrackerUiTest {
     private fun waitForText(text: String) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
             composeRule.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty()
-        }
-    }
-
-    private fun waitForContentDescription(description: String) {
-        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
-            composeRule.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isNotEmpty()
         }
     }
 

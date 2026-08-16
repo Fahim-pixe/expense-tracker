@@ -354,7 +354,7 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
                 val deleteLabel = if (entry.note.isBlank()) "Delete ${category.name} transaction" else "Delete ${entry.note}"
                 IconButton(
                     onClick = onDelete,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(48.dp).testTag("delete-transaction-action"),
                 ) {
                     Icon(Icons.Outlined.DeleteOutline, contentDescription = deleteLabel, tint = AppTokens.SpendCoral)
                 }
