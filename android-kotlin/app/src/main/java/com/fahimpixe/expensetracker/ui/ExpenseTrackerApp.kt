@@ -202,7 +202,9 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
 
             Button(
                 onClick = {
-                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = {})) onDismiss()
+                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = onDismiss)) {
+                        validationMessage = ""
+                    }
                     else validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp).testTag("save-transaction"),
