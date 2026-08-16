@@ -135,6 +135,7 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
     var note by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
     var validationMessage by rememberSaveable { mutableStateOf("") }
+    var isSaving by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(typeName, categories) {
@@ -202,19 +203,33 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
 
             Button(
                 onClick = {
-                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = onDismiss)) {
+                    isSaving = true
+                    if (viewModel.addTransaction(
+                            type = type,
+                            amountInput = amount,
+                            categoryId = categoryId,
+                            note = note,
+                            dateInput = date,
+                            onPersisted = {
+                                isSaving = false
+                                onDismiss()
+                            },
+                        )
+                    ) {
                         validationMessage = ""
+                    } else {
+                        isSaving = false
+                        validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                     }
-                    else validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                 },
-                enabled = viewModel.isMutationIdle,
+                enabled = !isSaving && viewModel.isMutationIdle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
-                    .testTag(if (viewModel.isMutationIdle) "save-transaction" else "save-transaction-pending"),
+                    .testTag(if (isSaving) "save-transaction-pending" else "save-transaction"),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
             ) {
-                Text(if (viewModel.isMutationIdle) "Save transaction" else "Saving…", fontWeight = FontWeight.Bold)
+                Text(if (isSaving) "Saving…" else "Save transaction", fontWeight = FontWeight.Bold)
             }
         }
     }
