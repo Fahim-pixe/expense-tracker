@@ -46,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -61,6 +62,7 @@ import com.fahimpixe.expensetracker.finance.FinanceCalculator
 import com.fahimpixe.expensetracker.finance.TransactionType
 import com.fahimpixe.expensetracker.ui.theme.AppTokens
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 private data class AppTab(
     val label: String,
@@ -135,14 +137,22 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
     var note by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf(LocalDate.now().toString()) }
     var validationMessage by rememberSaveable { mutableStateOf("") }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+    fun dismissSheet() {
+        scope.launch {
+            sheetState.hide()
+            onDismiss()
+        }
+    }
 
     LaunchedEffect(typeName, categories) {
         if (categories.none { it.id == categoryId }) categoryId = categories.firstOrNull()?.id.orEmpty()
     }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        onDismissRequest = ::dismissSheet,
+        sheetState = sheetState,
         modifier = Modifier.testTag("transaction-form"),
     ) {
         Column(
@@ -158,7 +168,7 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
                     Text("New transaction", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text("Keep your monthly picture current.", color = AppTokens.Muted, style = MaterialTheme.typography.bodyMedium)
                 }
-                IconButton(onClick = onDismiss) { Icon(Icons.Outlined.Close, contentDescription = "Close transaction form") }
+                IconButton(onClick = ::dismissSheet) { Icon(Icons.Outlined.Close, contentDescription = "Close transaction form") }
             }
 
             SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
@@ -201,7 +211,7 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
 
             Button(
                 onClick = {
-                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = {})) onDismiss()
+                    if (viewModel.addTransaction(type, amount, categoryId, note, date, onPersisted = {})) dismissSheet()
                     else validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp).testTag("save-transaction"),
