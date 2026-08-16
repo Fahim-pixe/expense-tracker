@@ -1,5 +1,7 @@
 package com.fahimpixe.expensetracker.ui
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
@@ -10,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fahimpixe.expensetracker.MainActivity
 import org.junit.Rule
@@ -38,9 +41,11 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
         waitForText("UI flow lunch")
-        composeRule.onNodeWithTag("activity-list").performScrollToNode(hasTestTag("delete-transaction-action"))
-        waitForTag("delete-transaction-action", useUnmergedTree = true)
-        composeRule.onNodeWithTag("delete-transaction-action", useUnmergedTree = true).performClick()
+        composeRule.onNodeWithTag("activity-list").performScrollToNode(hasTestTag("activity-transaction-row"))
+        waitForTag("activity-transaction-row")
+        composeRule.onNodeWithTag("activity-transaction-row").performTouchInput {
+            click(Offset(width - 24f, height / 2f))
+        }
         waitForAppReady()
         waitForText("Nothing found")
     }

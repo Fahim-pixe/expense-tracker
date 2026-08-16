@@ -338,7 +338,13 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
         shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
         modifier = Modifier.testTag("transaction-card-${entry.id}"),
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 11.dp)
+                .then(if (includeDelete) Modifier.testTag("activity-transaction-row") else Modifier),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             CategoryDot(category)
             Spacer(Modifier.width(11.dp))
             Column(modifier = Modifier.weight(1f)) {
