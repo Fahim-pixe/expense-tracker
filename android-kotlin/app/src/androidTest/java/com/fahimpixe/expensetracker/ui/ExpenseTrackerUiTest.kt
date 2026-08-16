@@ -34,6 +34,7 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("transaction-date").performTextClearance()
         composeRule.onNodeWithTag("transaction-date").performTextInput("2026-08-14")
         composeRule.onNodeWithTag("save-transaction").performClick()
+        waitForTag("save-transaction-pending")
         waitForAppReady()
 
         waitForTag("activity-list-ready")

@@ -207,10 +207,14 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
                     }
                     else validationMessage = "Enter an amount above zero, choose a category, and use a valid YYYY-MM-DD date."
                 },
-                modifier = Modifier.fillMaxWidth().height(52.dp).testTag("save-transaction"),
+                enabled = viewModel.isMutationIdle,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+                    .testTag(if (viewModel.isMutationIdle) "save-transaction" else "save-transaction-pending"),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
             ) {
-                Text("Save ${if (type == TransactionType.EXPENSE) "expense" else "income"}", fontWeight = FontWeight.Bold)
+                Text(if (viewModel.isMutationIdle) "Save transaction" else "Saving…", fontWeight = FontWeight.Bold)
             }
         }
     }
