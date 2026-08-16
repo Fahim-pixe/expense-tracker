@@ -153,10 +153,10 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
     ModalBottomSheet(
         onDismissRequest = ::dismissSheet,
         sheetState = sheetState,
-        modifier = Modifier.testTag("transaction-form"),
     ) {
         Column(
             modifier = Modifier
+                .testTag("transaction-form")
                 .fillMaxWidth()
                 .padding(horizontal = AppTokens.PagePadding)
                 .padding(bottom = 28.dp)
