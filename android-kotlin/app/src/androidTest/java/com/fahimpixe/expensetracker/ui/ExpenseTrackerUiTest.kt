@@ -2,14 +2,12 @@ package com.fahimpixe.expensetracker.ui
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.click
-import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
@@ -41,9 +39,8 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list-ready")
         waitForText("UI flow lunch")
-        composeRule.onNodeWithTag("activity-list-ready").performScrollToNode(hasTestTag("activity-transaction-row"))
-        waitForTag("activity-transaction-row")
-        composeRule.onNodeWithTag("activity-transaction-row").performTouchInput {
+        waitForTag("activity-transaction-row", useUnmergedTree = true)
+        composeRule.onNodeWithTag("activity-transaction-row", useUnmergedTree = true).performTouchInput {
             click(Offset(width - 24f, height / 2f))
         }
         waitForAppReady()
