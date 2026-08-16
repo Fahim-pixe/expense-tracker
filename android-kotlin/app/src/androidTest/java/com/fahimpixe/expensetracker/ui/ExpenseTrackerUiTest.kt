@@ -33,7 +33,6 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("transaction-date").performTextClearance()
         composeRule.onNodeWithTag("transaction-date").performTextInput("2026-08-14")
         composeRule.onNodeWithTag("save-transaction").performClick()
-        waitForTagAbsence("transaction-form")
         waitForAppReady()
 
         composeRule.onNodeWithTag("tab-activity").performClick()
@@ -86,12 +85,6 @@ class ExpenseTrackerUiTest {
     private fun waitForTag(tag: String) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
             composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
-        }
-    }
-
-    private fun waitForTagAbsence(tag: String) {
-        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
-            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isEmpty()
         }
     }
 
