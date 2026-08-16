@@ -336,7 +336,7 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
     Card(
         colors = CardDefaults.cardColors(containerColor = AppTokens.Surface),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
-        modifier = Modifier.testTag(if (includeDelete) "activity-transaction-card" else "transaction-card-${entry.id}"),
+        modifier = Modifier.testTag("transaction-card-${entry.id}"),
     ) {
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 11.dp), verticalAlignment = Alignment.CenterVertically) {
             CategoryDot(category)

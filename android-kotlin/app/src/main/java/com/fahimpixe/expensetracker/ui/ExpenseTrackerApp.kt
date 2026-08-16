@@ -140,7 +140,11 @@ private fun AddTransactionSheet(viewModel: FinanceViewModel, onDismiss: () -> Un
         if (categories.none { it.id == categoryId }) categoryId = categories.firstOrNull()?.id.orEmpty()
     }
 
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        modifier = Modifier.testTag("transaction-form"),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()

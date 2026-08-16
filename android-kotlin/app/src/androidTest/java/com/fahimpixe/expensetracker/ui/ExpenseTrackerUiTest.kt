@@ -1,16 +1,15 @@
 package com.fahimpixe.expensetracker.ui
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.click
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fahimpixe.expensetracker.MainActivity
 import org.junit.Rule
@@ -34,15 +33,14 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("transaction-date").performTextClearance()
         composeRule.onNodeWithTag("transaction-date").performTextInput("2026-08-14")
         composeRule.onNodeWithTag("save-transaction").performClick()
+        waitForTagAbsence("transaction-form")
         waitForAppReady()
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list")
         waitForText("UI flow lunch")
-        waitForTag("activity-transaction-card")
-        composeRule.onNodeWithTag("activity-transaction-card").performTouchInput {
-            click(Offset(width - 24f, height / 2f))
-        }
+        waitForContentDescription("Delete UI flow lunch")
+        composeRule.onNodeWithContentDescription("Delete UI flow lunch").performClick()
         waitForAppReady()
         waitForText("Nothing found")
     }
@@ -79,9 +77,21 @@ class ExpenseTrackerUiTest {
         }
     }
 
+    private fun waitForContentDescription(description: String) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithContentDescription(description).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
     private fun waitForTag(tag: String) {
         composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
             composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    private fun waitForTagAbsence(tag: String) {
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            composeRule.onAllNodesWithTag(tag).fetchSemanticsNodes().isEmpty()
         }
     }
 

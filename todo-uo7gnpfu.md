@@ -72,13 +72,9 @@
 - [ ] Provision protected native signing secrets in GitHub Actions and verify a manually dispatched signed APK/AAB release run.
 
 - [x] Standardize all GitHub Actions workflows on Node.js 24, actions/setup-java@v5, and compatible current action versions; validate native and Expo CI.
-
 - [ ] Replace the flaky API 29 third-party emulator CI step with an Android Gradle Managed Device and verify connected instrumentation in GitHub Actions.
-
 - [ ] Repair the remaining Compose add/delete test selector and rerun the managed-device API 29 instrumentation gate.
-
 - [ ] Expose and verify a stable transaction-delete UI test seam for the managed-device Compose test.
-
 - [ ] Make the Activity list scroll deterministically to the created transaction before invoking its delete action in Compose instrumentation.
-
 - [ ] Drive the rendered Activity transaction-card delete affordance deterministically in the Compose instrumentation test.
+- [ ] Wait for the transaction modal to leave composition before asserting Activity test state.
