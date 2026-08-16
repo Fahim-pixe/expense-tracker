@@ -39,9 +39,9 @@ class ExpenseTrackerUiTest {
         waitForAppReady()
 
         composeRule.onNodeWithTag("tab-activity").performClick()
-        waitForTag("activity-list")
+        waitForTag("activity-list-ready")
         waitForText("UI flow lunch")
-        composeRule.onNodeWithTag("activity-list").performScrollToNode(hasTestTag("activity-transaction-row"))
+        composeRule.onNodeWithTag("activity-list-ready").performScrollToNode(hasTestTag("activity-transaction-row"))
         waitForTag("activity-transaction-row")
         composeRule.onNodeWithTag("activity-transaction-row").performTouchInput {
             click(Offset(width - 24f, height / 2f))

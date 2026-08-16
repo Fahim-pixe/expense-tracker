@@ -128,9 +128,10 @@ fun ActivityScreen(viewModel: FinanceViewModel, modifier: Modifier = Modifier) {
             .sortedWith(compareByDescending<FinanceTransaction> { it.date }.thenByDescending { it.createdAtEpochMs })
     }
     val grouped = remember(visible) { visible.groupBy { it.date }.toSortedMap(compareByDescending { it }) }
+    val isReady = viewModel.isMutationIdle
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().statusBarsPadding().testTag("activity-list"),
+        modifier = modifier.fillMaxSize().statusBarsPadding().testTag(if (isReady) "activity-list-ready" else "activity-list-loading"),
         contentPadding = PaddingValues(start = AppTokens.PagePadding, end = AppTokens.PagePadding, top = 16.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
