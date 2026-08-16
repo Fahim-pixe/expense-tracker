@@ -3,6 +3,7 @@ package com.fahimpixe.expensetracker
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -29,6 +30,10 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
     private var pendingMutations by mutableIntStateOf(0)
     val isMutationIdle: Boolean
         get() = isInitialized && pendingMutations == 0
+
+    /** Increments only after a Room mutation and refreshed in-memory snapshot both complete. */
+    var completedMutationId by mutableLongStateOf(0L)
+        private set
 
     init {
         viewModelScope.launch {
@@ -90,6 +95,7 @@ class FinanceViewModel(application: Application) : AndroidViewModel(application)
             try {
                 mutation()
                 state = repository.snapshot()
+                completedMutationId += 1L
                 onCompleted()
             } finally {
                 pendingMutations -= 1

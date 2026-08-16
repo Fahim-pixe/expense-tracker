@@ -27,6 +27,7 @@ class ExpenseTrackerUiTest {
 
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list-ready")
+        val completedMutationIdBeforeSave = composeRule.activity.financeViewModel.completedMutationId
         composeRule.onNodeWithTag("add-transaction").performClick()
         composeRule.onNodeWithTag("transaction-amount").performTextInput("12.50")
         composeRule.onNodeWithTag("transaction-category-food").performClick()
@@ -34,7 +35,10 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("transaction-date").performTextClearance()
         composeRule.onNodeWithTag("transaction-date").performTextInput("2026-08-14")
         composeRule.onNodeWithTag("save-transaction").performClick()
-        waitForTag("save-transaction-pending")
+        composeRule.waitUntil(timeoutMillis = EMULATOR_TIMEOUT_MILLIS) {
+            val viewModel = composeRule.activity.financeViewModel
+            viewModel.isMutationIdle && viewModel.completedMutationId > completedMutationIdBeforeSave
+        }
         waitForAppReady()
 
         waitForTag("activity-list-ready")

@@ -80,3 +80,4 @@
 - [ ] Wait for the transaction modal to leave composition before asserting Activity test state.
 - [ ] Add an explicit Activity-screen readiness marker and use it to synchronize the native add/delete Compose test.
 - [ ] Refactor the Activity transaction-list item into a dedicated deterministic test contract for add/delete instrumentation.
+- [ ] Add a durable post-Room-mutation completion token and use it to synchronize native add/delete instrumentation.
