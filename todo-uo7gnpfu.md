@@ -81,3 +81,4 @@
 - [ ] Add an explicit Activity-screen readiness marker and use it to synchronize the native add/delete Compose test.
 - [ ] Refactor the Activity transaction-list item into a dedicated deterministic test contract for add/delete instrumentation.
 - [ ] Add a durable post-Room-mutation completion token and use it to synchronize native add/delete instrumentation.
+- [ ] Split the flaky add/delete Compose test into deterministic form smoke and seeded-ledger deletion coverage.
