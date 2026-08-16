@@ -1,7 +1,5 @@
 package com.fahimpixe.expensetracker.ui
 
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -10,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.fahimpixe.expensetracker.MainActivity
 import org.junit.Rule
@@ -39,10 +37,11 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list-ready")
         waitForText("UI flow lunch")
-        waitForTag("activity-transaction-row", useUnmergedTree = true)
-        composeRule.onNodeWithTag("activity-transaction-row", useUnmergedTree = true).performTouchInput {
-            click(Offset(width - 24f, height / 2f))
-        }
+        waitForTag("activity-transaction-row")
+        val row = composeRule.onNodeWithTag("activity-transaction-row").fetchSemanticsNode()
+        val deleteAction = row.config[SemanticsActions.CustomActions]
+            .firstOrNull { it.label == "Delete transaction" }
+        check(deleteAction?.action?.invoke() == true)
         waitForAppReady()
         waitForText("Nothing found")
     }

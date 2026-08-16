@@ -51,8 +51,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag as semanticsTestTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -334,6 +337,21 @@ private fun CategoryTotalsCard(totals: List<CategoryTotal>, totalExpense: Long, 
 @Composable
 private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDelete: () -> Unit, includeDelete: Boolean = false) {
     val category = state.categories.firstOrNull { it.id == entry.categoryId } ?: return
+    val transactionLabel = entry.note.ifBlank { category.name }
+    val activityRowSemantics = if (includeDelete) {
+        Modifier.semantics(mergeDescendants = true) {
+            semanticsTestTag = "activity-transaction-row"
+            contentDescription = "Transaction $transactionLabel"
+            customActions = listOf(
+                CustomAccessibilityAction("Delete transaction") {
+                    onDelete()
+                    true
+                },
+            )
+        }
+    } else {
+        Modifier
+    }
     Card(
         colors = CardDefaults.cardColors(containerColor = AppTokens.Surface),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(AppTokens.ButtonRadius),
@@ -343,13 +361,13 @@ private fun TransactionCard(entry: FinanceTransaction, state: FinanceState, onDe
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 11.dp)
-                .then(if (includeDelete) Modifier.testTag("activity-transaction-row") else Modifier),
+                .then(activityRowSemantics),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             CategoryDot(category)
             Spacer(Modifier.width(11.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(entry.note.ifBlank { category.name }, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(transactionLabel, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("${category.name} · ${entry.date}", color = AppTokens.Muted, style = MaterialTheme.typography.bodySmall)
             }
             Text(

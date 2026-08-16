@@ -79,3 +79,4 @@
 - [ ] Drive the rendered Activity transaction-card delete affordance deterministically in the Compose instrumentation test.
 - [ ] Wait for the transaction modal to leave composition before asserting Activity test state.
 - [ ] Add an explicit Activity-screen readiness marker and use it to synchronize the native add/delete Compose test.
+- [ ] Refactor the Activity transaction-list item into a dedicated deterministic test contract for add/delete instrumentation.
