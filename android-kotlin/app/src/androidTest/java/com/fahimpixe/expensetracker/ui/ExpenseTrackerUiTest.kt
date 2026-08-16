@@ -25,6 +25,8 @@ class ExpenseTrackerUiTest {
         waitForAppReady()
         resetLocalLedger()
 
+        composeRule.onNodeWithTag("tab-activity").performClick()
+        waitForTag("activity-list-ready")
         composeRule.onNodeWithTag("add-transaction").performClick()
         composeRule.onNodeWithTag("transaction-amount").performTextInput("12.50")
         composeRule.onNodeWithTag("transaction-category-food").performClick()
@@ -34,7 +36,6 @@ class ExpenseTrackerUiTest {
         composeRule.onNodeWithTag("save-transaction").performClick()
         waitForAppReady()
 
-        composeRule.onNodeWithTag("tab-activity").performClick()
         waitForTag("activity-list-ready")
         waitForText("UI flow lunch")
         waitForTag("activity-transaction-row")
